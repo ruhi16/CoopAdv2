@@ -22,7 +22,13 @@ class CreateLoanPaymentParticularsTable extends Migration
             $table->integer('loan_scheme_detail_feature_id')->nullable();
             $table->double('loan_scheme_detail_feature_value', 15, 2)->nullable();
             $table->string('loan_scheme_detail_feature_condition')->nullable();
+            
             $table->integer('loan_emi_schedule_id')->nullable();
+            $table->integer('loan_emi_schedule_index')->nullable();
+            $table->double('emi_amount', 15, 2)->nullable();
+            $table->double('emi_principal_amount', 15, 2)->nullable();
+            $table->double('emi_interest_amount', 15, 2)->nullable();
+
 
             $table->string('name')->nullable();
             $table->string('description')->nullable();

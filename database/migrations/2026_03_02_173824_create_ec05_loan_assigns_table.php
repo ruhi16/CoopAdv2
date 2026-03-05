@@ -26,6 +26,7 @@ class CreateEc05LoanAssignsTable extends Migration
             $table->date('loan_assigned_date')->nullable();
             $table->date('loan_released_date')->nullable();
             $table->date('loan_closed_date')->nullable();
+            
             $table->decimal('loan_amount', 15, 2)->nullable();
             $table->decimal('loan_current_balance', 15, 2)->nullable();
             $table->decimal('roi', 10, 2)->nullable();

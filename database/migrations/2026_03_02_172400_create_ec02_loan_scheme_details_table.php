@@ -21,6 +21,7 @@ class CreateEc02LoanSchemeDetailsTable extends Migration
             $table->double('loan_scheme_feature_value', 15, 2)->nullable();
 
             $table->string('loan_scheme_feature_condition')->nullable();
+            $table->enum('loan_scheme_feature_type', ['optional', 'conditional', 'mandatory'])->nullable();
 
             $table->string('name')->nullable();
             $table->string('description')->nullable();

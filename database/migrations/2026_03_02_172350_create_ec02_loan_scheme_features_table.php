@@ -21,8 +21,8 @@ class CreateEc02LoanSchemeFeaturesTable extends Migration
             $table->string('description')->nullable();
             $table->integer('order_index')->default(0);
 
-            $table->string('feature_type')->nullable();         
-            $table->string('feature_value_type')->nullable();
+            $table->enum('feature_type', ['optional', 'conditional', 'mandatory'])->nullable();         
+            $table->enum('feature_value_type', ['text', 'number', 'date', 'boolean', 'select', 'radio', 'checkbox', 'file', 'image'])->nullable();
 
 
             $table->boolean('is_default')->default(false);

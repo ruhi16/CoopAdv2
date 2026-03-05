@@ -10,9 +10,9 @@ class CreateLoanTaskPaymentsTable extends Migration{
     {
         Schema::create('loan_task_payments', function (Blueprint $table) {
             $table->id();
-            $table->integer('loan_assign_id')->nullable(false);
-            $table->foreignId('loan_task_id')->constrained()->onDelete('cascade');
-            $table->decimal('amount', 15, 2)->default(0);
+            // $table->integer('loan_assign_id')->nullable(false);
+            // $table->foreignId('loan_task_id')->constrained()->onDelete('cascade');
+            // $table->decimal('amount', 15, 2)->default(0);
 
             $table->string('name')->nullable();
             $table->string('description')->nullable();

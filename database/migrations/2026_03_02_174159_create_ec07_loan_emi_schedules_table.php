@@ -21,6 +21,7 @@ class CreateEc07LoanEmiSchedulesTable extends Migration
             $table->string('description')->nullable();
             $table->integer('order_index')->default(0);
 
+            $table->integer('emi_schedule_index')->nullable();
             $table->date('emi_due_date')->nullable();
             $table->date('emi_paid_date')->nullable();
             $table->decimal('total_emi_amount', 15, 2)->default(0);
@@ -29,12 +30,7 @@ class CreateEc07LoanEmiSchedulesTable extends Migration
 
             $table->decimal('principal_balance_amount_before_emi', 15, 2)->default(0);
             $table->decimal('principal_balance_amount_after_emi', 15, 2)->default(0);
-            
-            // $table->decimal('penalty_amount', 15, 2)->default(0);
-            // $table->decimal('paid_amount', 15, 2)->default(0);
-            // $table->decimal('due_amount', 15, 2)->default(0);
-
-
+          
             $table->boolean('is_default')->default(false);
             $table->boolean('is_active')->default(true);
             $table->integer('created_by')->default(0);

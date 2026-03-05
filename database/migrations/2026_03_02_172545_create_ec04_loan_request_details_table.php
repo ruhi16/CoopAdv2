@@ -19,6 +19,7 @@ class CreateEc04LoanRequestDetailsTable extends Migration
             $table->integer('loan_scheme_detail_id')->nullable();
             $table->integer('loan_scheme_feature_id')->nullable();
             $table->string('loan_scheme_feature_name')->nullable();
+            
             $table->double('loan_scheme_feature_value', 15, 2)->nullable();
             $table->string('loan_scheme_feature_condition')->nullable();
 
