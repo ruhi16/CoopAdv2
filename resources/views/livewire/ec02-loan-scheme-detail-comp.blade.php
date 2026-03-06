@@ -27,35 +27,37 @@
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">No.</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Name</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Scheme</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Feature</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Value</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Condition</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Status</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Active</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Action</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">ID</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Scheme</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Feature</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Type</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Value Type</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Value</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Condition</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Order</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Active</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @forelse ($details as $detail)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-3 py-2">{{ $loop->iteration + ($details->currentPage() - 1) * $details->perPage() }}</td>
-                                <td class="px-3 py-2">{{ $detail->name }}</td>
-                                <td class="px-3 py-2">{{ $detail->loanScheme->name ?? '-' }}</td>
-                                <td class="px-3 py-2">{{ $detail->loan_scheme_feature_name }}</td>
-                                <td class="px-3 py-2">{{ $detail->loan_scheme_feature_value }}</td>
-                                <td class="px-3 py-2">{{ $detail->loan_scheme_feature_condition }}</td>
-                                <td class="px-3 py-2">{{ $detail->status }}</td>
-                                <td class="px-3 py-2">
+                                <td class="px-2 py-2">{{ $detail->id }}</td>
+                                <td class="px-2 py-2">{{ $detail->loanScheme->name ?? '-' }}</td>
+                                <td class="px-2 py-2">{{ $detail->loan_scheme_feature_name }}</td>
+                                <td class="px-2 py-2">{{ $detail->loan_scheme_feature_type }}</td>
+                                <td class="px-2 py-2">{{ $detail->loan_scheme_feature_value_type }}</td>
+                                <td class="px-2 py-2">{{ $detail->loan_scheme_feature_value }}</td>
+                                <td class="px-2 py-2">{{ $detail->loan_scheme_feature_condition }}</td>
+                                <td class="px-2 py-2">{{ $detail->order_index }}</td>
+                                <td class="px-2 py-2">
                                     @if($detail->is_active)
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Active</span>
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Yes</span>
                                     @else
-                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Inactive</span>
+                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">No</span>
                                     @endif
                                 </td>
-                                <td class="px-3 py-2">
+                                <td class="px-2 py-2">
                                     <button class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 mr-1" wire:click="edit({{ $detail->id }})">Edit</button>
                                     @if ($confirmingDelete === $detail->id)
                                         <button class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 mr-1" wire:click="delete({{ $detail->id }})">Confirm</button>
@@ -67,7 +69,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-3 py-4 text-center text-gray-500">No details found.</td>
+                                <td colspan="10" class="px-2 py-4 text-center text-gray-500">No details found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -114,15 +116,19 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Feature Name</label>
-                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_name" placeholder="Feature Name">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Feature Type</label>
+                                <input type="text" class="w-full px-2 py-1.5 border border-gray-200 bg-gray-100 rounded text-sm" wire:model="loan_scheme_feature_type" readonly>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Feature Value</label>
-                                <input type="number" step="0.01" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_value" placeholder="0.00">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Feature Value Type</label>
+                                <input type="text" class="w-full px-2 py-1.5 border border-gray-200 bg-gray-100 rounded text-sm" wire:model="loan_scheme_feature_value_type" readonly>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 mt-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Feature Value</label>
+                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_value" placeholder="Value">
+                            </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Condition</label>
                                 <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_condition">
@@ -133,19 +139,25 @@
                                     <option value="percentage">Percentage</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Index</label>
                                 <input type="number" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="order_index" placeholder="0">
                             </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 mt-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Name</label>
-                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="name" placeholder="Name">
-                            </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
                                 <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="status" placeholder="Status">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-3">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" wire:model="is_active" id="is_active">
+                                <label class="text-sm text-gray-700" for="is_active">Is Active</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" wire:model="is_default" id="is_default">
+                                <label class="text-sm text-gray-700" for="is_default">Is Default</label>
                             </div>
                         </div>
                         <div class="mt-3">

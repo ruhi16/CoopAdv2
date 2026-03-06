@@ -33,6 +33,7 @@ class Ec04LoanRequestDetailComp extends Component
     public $isOpen = 0;
     public $search = '';
     public $confirmingDelete = null;
+    public $selectedSchemeDetails = [];
 
     protected function rules()
     {
@@ -54,8 +55,19 @@ class Ec04LoanRequestDetailComp extends Component
     public function render()
     {
         $loanRequests = Ec03LoanRequest::with('member')->orderBy('id', 'desc')->get();
-        $loanSchemeDetails = Ec02LoanSchemeDetail::orderBy('name')->get();
-        $loanSchemeFeatures = Ec02LoanSchemeFeature::orderBy('name')->get();
+        
+        $loanSchemeDetails = [];
+        $loanSchemeFeatures = [];
+        
+        if ($this->loan_request_id) {
+            $loanRequest = Ec03LoanRequest::find($this->loan_request_id);
+            if ($loanRequest && $loanRequest->loan_scheme_id) {
+                $loanSchemeDetails = Ec02LoanSchemeDetail::where('loan_scheme_id', $loanRequest->loan_scheme_id)
+                    ->orderBy('order_index', 'asc')
+                    ->get();
+                $loanSchemeFeatures = Ec02LoanSchemeFeature::orderBy('name')->get();
+            }
+        }
 
         $details = Ec04LoanRequestDetail::with(['loanRequest.member', 'loanSchemeDetail', 'loanSchemeFeature'])
             ->when($this->search, function ($query) {
@@ -111,14 +123,32 @@ class Ec04LoanRequestDetailComp extends Component
 
     public function store()
     {
-        $validated = $this->validate();
+        $this->validate([
+            'loan_request_id' => 'required|integer',
+        ]);
 
-        Ec04LoanRequestDetail::updateOrCreate(['id' => $this->detail_id], array_merge($validated, [
-            'is_default' => $this->is_default,
-            'is_active' => $this->is_active,
-        ]));
-
-        session()->flash('message', $this->detail_id ? 'Loan Detail Updated Successfully.' : 'Loan Detail Created Successfully.');
+        if (!empty($this->selectedSchemeDetails)) {
+            foreach ($this->selectedSchemeDetails as $detail) {
+                Ec04LoanRequestDetail::create([
+                    'loan_request_id' => $this->loan_request_id,
+                    'loan_scheme_detail_id' => $detail['loan_scheme_detail_id'] ?? null,
+                    'loan_scheme_feature_id' => $detail['loan_scheme_feature_id'] ?? null,
+                    'loan_scheme_feature_name' => $detail['loan_scheme_feature_name'] ?? '',
+                    'loan_scheme_feature_value' => $detail['loan_scheme_feature_value'] ?? '',
+                    'loan_scheme_feature_condition' => $detail['loan_scheme_feature_condition'] ?? '',
+                    'name' => $detail['name'] ?? '',
+                    'is_active' => $detail['is_active'] ?? true,
+                ]);
+            }
+            session()->flash('message', 'Loan Details Created Successfully.');
+        } else {
+            $validated = $this->validate();
+            Ec04LoanRequestDetail::updateOrCreate(['id' => $this->detail_id], array_merge($validated, [
+                'is_default' => $this->is_default,
+                'is_active' => $this->is_active,
+            ]));
+            session()->flash('message', $this->detail_id ? 'Loan Detail Updated Successfully.' : 'Loan Detail Created Successfully.');
+        }
 
         $this->closeModal();
     }
@@ -189,8 +219,31 @@ class Ec04LoanRequestDetailComp extends Component
         $this->resetPage();
     }
 
-    public function updatedLoanRequestId()
+    public function updatedLoanRequestId($value)
     {
+        $this->selectedSchemeDetails = [];
+        
+        if ($value) {
+            $loanRequest = Ec03LoanRequest::find($value);
+            if ($loanRequest && $loanRequest->loan_scheme_id) {
+                $schemeDetails = Ec02LoanSchemeDetail::where('loan_scheme_id', $loanRequest->loan_scheme_id)
+                    ->orderBy('order_index', 'asc')
+                    ->get();
+                
+                foreach ($schemeDetails as $detail) {
+                    $this->selectedSchemeDetails[] = [
+                        'loan_scheme_detail_id' => $detail->id,
+                        'loan_scheme_feature_id' => $detail->loan_scheme_feature_id,
+                        'loan_scheme_feature_name' => $detail->loan_scheme_feature_name,
+                        'loan_scheme_feature_value' => $detail->loan_scheme_feature_value,
+                        'loan_scheme_feature_condition' => $detail->loan_scheme_feature_condition,
+                        'name' => $detail->name,
+                        'is_active' => true,
+                    ];
+                }
+            }
+        }
+        
         $this->resetPage();
     }
 }

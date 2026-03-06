@@ -115,17 +115,36 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Feature Type</label>
-                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="feature_type" placeholder="Type">
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="feature_type">
+                                    <option value="">Select Type</option>
+                                    <option value="optional">Optional</option>
+                                    <option value="conditional">Conditional</option>
+                                    <option value="mandatory">Mandatory</option>
+                                </select>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Feature Value Type</label>
-                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="feature_value_type" placeholder="Value Type">
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="feature_value_type">
+                                    <option value="">Select Value Type</option>
+                                    <option value="text">Text</option>
+                                    <option value="number">Number</option>
+                                    <option value="date">Date</option>
+                                    <option value="boolean">Boolean</option>
+                                    <option value="select">Select</option>
+                                    <option value="radio">Radio</option>
+                                    <option value="checkbox">Checkbox</option>
+                                    <option value="file">File</option>
+                                    <option value="image">Image</option>
+                                </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="status" placeholder="Status">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Is Active <span class="text-red-500">*</span></label>
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="is_active">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
                             </div>
                         </div>
                         <div class="mt-3">

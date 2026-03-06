@@ -14,6 +14,8 @@ class Ec02LoanSchemeDetail extends Model
         'loan_scheme_id',
         'loan_scheme_feature_id',
         'loan_scheme_feature_name',
+        'loan_scheme_feature_type',
+        'loan_scheme_feature_value_type',
         'loan_scheme_feature_value',
         'loan_scheme_feature_condition',
         'name',

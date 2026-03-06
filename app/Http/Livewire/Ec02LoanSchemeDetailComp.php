@@ -18,6 +18,8 @@ class Ec02LoanSchemeDetailComp extends Component
     public $loan_scheme_id = '';
     public $loan_scheme_feature_id = '';
     public $loan_scheme_feature_name = '';
+    public $loan_scheme_feature_type = '';
+    public $loan_scheme_feature_value_type = '';
     public $loan_scheme_feature_value = '';
     public $loan_scheme_feature_condition = '';
     public $name = '';
@@ -38,7 +40,9 @@ class Ec02LoanSchemeDetailComp extends Component
             'loan_scheme_id' => 'nullable|integer',
             'loan_scheme_feature_id' => 'nullable|integer',
             'loan_scheme_feature_name' => 'nullable|string|max:255',
-            'loan_scheme_feature_value' => 'nullable|numeric',
+            'loan_scheme_feature_type' => 'nullable|string|max:100',
+            'loan_scheme_feature_value_type' => 'nullable|string|max:50',
+            'loan_scheme_feature_value' => 'nullable|string|max:255',
             'loan_scheme_feature_condition' => 'nullable|string|max:100',
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:500',
@@ -94,6 +98,8 @@ class Ec02LoanSchemeDetailComp extends Component
         $this->loan_scheme_id = '';
         $this->loan_scheme_feature_id = '';
         $this->loan_scheme_feature_name = '';
+        $this->loan_scheme_feature_type = '';
+        $this->loan_scheme_feature_value_type = '';
         $this->loan_scheme_feature_value = '';
         $this->loan_scheme_feature_condition = '';
         $this->name = '';
@@ -127,6 +133,8 @@ class Ec02LoanSchemeDetailComp extends Component
         $this->loan_scheme_id = $detail->loan_scheme_id;
         $this->loan_scheme_feature_id = $detail->loan_scheme_feature_id;
         $this->loan_scheme_feature_name = $detail->loan_scheme_feature_name;
+        $this->loan_scheme_feature_type = $detail->loan_scheme_feature_type;
+        $this->loan_scheme_feature_value_type = $detail->loan_scheme_feature_value_type;
         $this->loan_scheme_feature_value = $detail->loan_scheme_feature_value;
         $this->loan_scheme_feature_condition = $detail->loan_scheme_feature_condition;
         $this->name = $detail->name;
@@ -147,8 +155,23 @@ class Ec02LoanSchemeDetailComp extends Component
             $feature = Ec02LoanSchemeFeature::find($value);
             if ($feature) {
                 $this->loan_scheme_feature_name = $feature->name;
+                $this->loan_scheme_feature_type = $feature->feature_type;
+                $this->loan_scheme_feature_value_type = $feature->feature_value_type;
             }
+        } else {
+            $this->loan_scheme_feature_name = '';
+            $this->loan_scheme_feature_type = '';
+            $this->loan_scheme_feature_value_type = '';
         }
+    }
+
+    public function updatedLoanSchemeId($value)
+    {
+        $this->loan_scheme_feature_id = '';
+        $this->loan_scheme_feature_name = '';
+        $this->loan_scheme_feature_type = '';
+        $this->loan_scheme_feature_value_type = '';
+        $this->resetPage();
     }
 
     public function confirmDelete($id)
@@ -169,11 +192,6 @@ class Ec02LoanSchemeDetailComp extends Component
     }
 
     public function updatingSearch()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedLoanSchemeId()
     {
         $this->resetPage();
     }

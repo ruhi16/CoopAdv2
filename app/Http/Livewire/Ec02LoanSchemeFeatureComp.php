@@ -38,6 +38,7 @@ class Ec02LoanSchemeFeatureComp extends Component
             'order_index' => 'nullable|integer|min:0',
             'feature_type' => 'nullable|string|max:100',
             'feature_value_type' => 'nullable|string|max:50',
+            'is_active' => 'required|boolean',
             'status' => 'nullable|string|max:50',
             'remarks' => 'nullable|string|max:1000',
         ];
@@ -92,7 +93,7 @@ class Ec02LoanSchemeFeatureComp extends Component
         $this->feature_type = '';
         $this->feature_value_type = '';
         $this->is_default = false;
-        $this->is_active = true;
+        $this->is_active = '1';
         $this->remarks = '';
         $this->status = '';
         $this->confirmingDelete = null;
@@ -104,7 +105,7 @@ class Ec02LoanSchemeFeatureComp extends Component
 
         Ec02LoanSchemeFeature::updateOrCreate(['id' => $this->feature_id], array_merge($validated, [
             'is_default' => $this->is_default,
-            'is_active' => $this->is_active,
+            'is_active' => (bool) $this->is_active,
         ]));
 
         session()->flash('message', $this->feature_id ? 'Feature Updated Successfully.' : 'Feature Created Successfully.');
@@ -123,7 +124,7 @@ class Ec02LoanSchemeFeatureComp extends Component
         $this->feature_type = $feature->feature_type;
         $this->feature_value_type = $feature->feature_value_type;
         $this->is_default = $feature->is_default;
-        $this->is_active = $feature->is_active;
+        $this->is_active = (string) $feature->is_active;
         $this->remarks = $feature->remarks;
         $this->status = $feature->status;
 

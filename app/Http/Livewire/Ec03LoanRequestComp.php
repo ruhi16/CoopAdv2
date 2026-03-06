@@ -40,8 +40,6 @@ class Ec03LoanRequestComp extends Component
             'loan_amount' => 'nullable|numeric|min:0',
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:500',
-            'order_index' => 'nullable|integer|min:0',
-            'status' => 'nullable|string|max:50',
             'remarks' => 'nullable|string|max:1000',
         ];
     }
@@ -99,11 +97,9 @@ class Ec03LoanRequestComp extends Component
         $this->loan_amount = '';
         $this->name = '';
         $this->description = '';
-        $this->order_index = '';
         $this->is_default = false;
         $this->is_active = true;
         $this->remarks = '';
-        $this->status = 'Pending';
         $this->schemeDetails = [];
         $this->confirmingDelete = null;
     }
@@ -131,11 +127,9 @@ class Ec03LoanRequestComp extends Component
         $this->loan_amount = $loanRequest->loan_amount;
         $this->name = $loanRequest->name;
         $this->description = $loanRequest->description;
-        $this->order_index = $loanRequest->order_index;
         $this->is_default = $loanRequest->is_default;
         $this->is_active = $loanRequest->is_active;
         $this->remarks = $loanRequest->remarks;
-        $this->status = $loanRequest->status;
 
         $this->loadSchemeDetails($this->loan_scheme_id);
         $this->resetValidation();
