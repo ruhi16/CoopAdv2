@@ -14,6 +14,8 @@ class Ec03LoanRequest extends Model
         'member_id',
         'loan_scheme_id',
         'loan_amount',
+        'no_of_years',
+        'emi_active',
         'name',
         'description',
         'order_index',
@@ -39,5 +41,10 @@ class Ec03LoanRequest extends Model
     public function loanRequestDetails()
     {
         return $this->hasMany(Ec04LoanRequestDetail::class, 'loan_request_id');
+    }
+
+    public function emiSchedules()
+    {
+        return $this->hasMany(Ec07LoanEmiSchedule::class, 'loan_request_id');
     }
 }

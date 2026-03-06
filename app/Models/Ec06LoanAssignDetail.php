@@ -11,18 +11,31 @@ class Ec06LoanAssignDetail extends Model
     protected $table = 'ec06_loan_assign_details';
     protected $guarded = ['id'];
     protected $fillable = [
-        'ec03_loan_request_id',
-        'ec05_loan_assign_id',
+        'loan_assign_id',
+        'loan_scheme_detail_id',
+        'loan_scheme_detail_feature_id',
+        'loan_scheme_detail_feature_name',
+        'loan_scheme_detail_feature_value',
+        'loan_scheme_detail_feature_condition',
         'name',
         'description',
-        'join_date',
-        'exit_date',
+        'order_index',
         'is_default',
         'is_active',
         'created_by',
         'approved_by',
-        'school_id',    
+        'school_id',
         'remarks',
         'status',
     ];
+
+    public function loanAssign()
+    {
+        return $this->belongsTo(Ec05LoanAssign::class, 'loan_assign_id');
+    }
+
+    public function loanSchemeDetail()
+    {
+        return $this->belongsTo(Ec02LoanSchemeDetail::class, 'loan_scheme_detail_id');
+    }
 }

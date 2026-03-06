@@ -134,19 +134,20 @@
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Loan Amount</label>
                                 <input type="number" step="0.01" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_amount" placeholder="0.00">
                             </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="status">
-                                    <option value="Pending">Pending</option>
-                                    <option value="Approved">Approved</option>
-                                    <option value="Rejected">Rejected</option>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">No of Years</label>
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="no_of_years">
+                                    <option value="">Select Years</option>
+                                    <option value="1">1 Year</option>
+                                    <option value="2">2 Years</option>
+                                    <option value="3">3 Years</option>
+                                    <option value="4">4 Years</option>
+                                    <option value="5">5 Years</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Order Index</label>
-                                <input type="number" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="order_index" placeholder="0">
+                            <div class="flex items-center mt-5">
+                                <input type="checkbox" id="emi_active" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" wire:model="emi_active">
+                                <label for="emi_active" class="ml-2 text-sm text-gray-700">EMI Active</label>
                             </div>
                         </div>
                         <div class="mt-3">
@@ -178,6 +179,34 @@
                                                 <td class="px-2 py-1">{{ $detail['loan_scheme_feature_name'] ?? '-' }}</td>
                                                 <td class="px-2 py-1">{{ $detail['loan_scheme_feature_value'] ?? '-' }}</td>
                                                 <td class="px-2 py-1">{{ $detail['loan_scheme_feature_condition'] ?? '-' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        @endif
+
+                        @if($emi_active && count($calculatedEmis) > 0)
+                        <div class="mt-4">
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">EMI Schedule</label>
+                            <div class="overflow-x-auto border border-gray-200 rounded max-h-48">
+                                <table class="min-w-full text-xs">
+                                    <thead class="bg-gray-50 sticky top-0">
+                                        <tr>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">EMI No.</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Principal Amt</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Interest Amt</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        @foreach($calculatedEmis as $emi)
+                                            <tr>
+                                                <td class="px-2 py-1">{{ $emi['emi_no'] }}</td>
+                                                <td class="px-2 py-1">{{ number_format($emi['principal_amount'], 2) }}</td>
+                                                <td class="px-2 py-1">{{ number_format($emi['interest_amount'], 2) }}</td>
+                                                <td class="px-2 py-1">{{ number_format($emi['total'], 2) }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

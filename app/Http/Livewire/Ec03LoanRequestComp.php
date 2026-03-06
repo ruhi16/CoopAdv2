@@ -7,6 +7,7 @@ use App\Models\Ec03LoanRequest;
 use App\Models\MemberDb;
 use App\Models\Ec01LoanScheme;
 use App\Models\Ec02LoanSchemeDetail;
+use App\Models\Ec04LoanRequestDetail;
 use Livewire\WithPagination;
 
 class Ec03LoanRequestComp extends Component
@@ -19,6 +20,8 @@ class Ec03LoanRequestComp extends Component
     public $member_id = '';
     public $loan_scheme_id = '';
     public $loan_amount = '';
+    public $no_of_years = '';
+    public $emi_active = false;
     public $name = '';
     public $description = '';
     public $order_index = '';
@@ -31,6 +34,7 @@ class Ec03LoanRequestComp extends Component
     public $search = '';
     public $confirmingDelete = null;
     public $schemeDetails = [];
+    public $calculatedEmis = [];
 
     protected function rules()
     {
@@ -95,12 +99,15 @@ class Ec03LoanRequestComp extends Component
         $this->member_id = '';
         $this->loan_scheme_id = '';
         $this->loan_amount = '';
+        $this->no_of_years = '';
+        $this->emi_active = false;
         $this->name = '';
         $this->description = '';
         $this->is_default = false;
         $this->is_active = true;
         $this->remarks = '';
         $this->schemeDetails = [];
+        $this->calculatedEmis = [];
         $this->confirmingDelete = null;
     }
 
@@ -108,10 +115,39 @@ class Ec03LoanRequestComp extends Component
     {
         $validated = $this->validate();
 
-        Ec03LoanRequest::updateOrCreate(['id' => $this->loan_request_id], array_merge($validated, [
+        $loanRequest = Ec03LoanRequest::updateOrCreate(['id' => $this->loan_request_id], array_merge($validated, [
+            'no_of_years' => $this->no_of_years,
+            'emi_active' => $this->emi_active,
             'is_default' => $this->is_default,
             'is_active' => $this->is_active,
         ]));
+
+        if (!$this->loan_request_id && $this->loan_scheme_id) {
+            $schemeDetails = Ec02LoanSchemeDetail::where('loan_scheme_id', $this->loan_scheme_id)
+                ->orderBy('order_index', 'asc')
+                ->get();
+
+            foreach ($schemeDetails as $detail) {
+                Ec04LoanRequestDetail::create([
+                    'loan_request_id' => $loanRequest->id,
+                    'loan_scheme_detail_id' => $detail->id,
+                    'loan_scheme_feature_id' => $detail->loan_scheme_feature_id,
+                    'loan_scheme_feature_name' => $detail->loan_scheme_feature_name,
+                    'loan_scheme_feature_value' => $detail->loan_scheme_feature_value,
+                    'loan_scheme_feature_condition' => $detail->loan_scheme_feature_condition,
+                    'name' => $detail->name,
+                    'description' => $detail->description,
+                    'order_index' => $detail->order_index,
+                    'is_default' => $detail->is_default,
+                    'is_active' => $detail->is_active,
+                    'created_by' => $detail->created_by,
+                    'approved_by' => $detail->approved_by,
+                    'school_id' => $detail->school_id,
+                    'remarks' => $detail->remarks,
+                    'status' => $detail->status,
+                ]);
+            }
+        }
 
         session()->flash('message', $this->loan_request_id ? 'Loan Request Updated Successfully.' : 'Loan Request Created Successfully.');
 
@@ -125,6 +161,8 @@ class Ec03LoanRequestComp extends Component
         $this->member_id = $loanRequest->member_id;
         $this->loan_scheme_id = $loanRequest->loan_scheme_id;
         $this->loan_amount = $loanRequest->loan_amount;
+        $this->no_of_years = $loanRequest->no_of_years;
+        $this->emi_active = $loanRequest->emi_active;
         $this->name = $loanRequest->name;
         $this->description = $loanRequest->description;
         $this->is_default = $loanRequest->is_default;
@@ -132,6 +170,9 @@ class Ec03LoanRequestComp extends Component
         $this->remarks = $loanRequest->remarks;
 
         $this->loadSchemeDetails($this->loan_scheme_id);
+        if ($this->emi_active && $this->loan_amount && $this->no_of_years) {
+            $this->calculateEmis();
+        }
         $this->resetValidation();
         $this->openModal();
     }
@@ -149,6 +190,66 @@ class Ec03LoanRequestComp extends Component
     public function updatedLoanSchemeId($value)
     {
         $this->loadSchemeDetails($value);
+    }
+
+    public function updatedLoanAmount($value)
+    {
+        if ($this->emi_active && $value && $this->no_of_years) {
+            $this->calculateEmis();
+        }
+    }
+
+    public function updatedNoOfYears($value)
+    {
+        if ($this->emi_active && $value && $this->loan_amount) {
+            $this->calculateEmis();
+        }
+    }
+
+    public function updatedEmiActive($value)
+    {
+        if ($value && $this->loan_amount && $this->no_of_years) {
+            $this->calculateEmis();
+        } else {
+            $this->calculatedEmis = [];
+        }
+    }
+
+    private function calculateEmis()
+    {
+        $principal = floatval($this->loan_amount);
+        $years = intval($this->no_of_years);
+        
+        if ($principal <= 0 || $years <= 0) {
+            $this->calculatedEmis = [];
+            return;
+        }
+
+        $interestRate = 12;
+        $monthlyRate = $interestRate / 12 / 100;
+        $totalMonths = $years * 12;
+
+        $monthlyEmi = ($principal * $monthlyRate * pow(1 + $monthlyRate, $totalMonths)) / (pow(1 + $monthlyRate, $totalMonths) - 1);
+
+        $this->calculatedEmis = [];
+        $totalPrincipal = 0;
+        $totalInterest = 0;
+
+        for ($i = 1; $i <= $totalMonths; $i++) {
+            $interestAmount = $principal * $monthlyRate;
+            $principalAmount = $monthlyEmi - $interestAmount;
+            $principal -= $principalAmount;
+            
+            $totalPrincipal += $principalAmount;
+            $totalInterest += $interestAmount;
+
+            $this->calculatedEmis[] = [
+                'emi_no' => $i,
+                'principal_amount' => round($principalAmount, 2),
+                'interest_amount' => round($interestAmount, 2),
+                'total' => round($monthlyEmi, 2),
+            ];
+        }
     }
 
     private function loadSchemeDetails($schemeId)

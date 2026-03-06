@@ -18,6 +18,7 @@ class CreateEc03LoanRequestsTable extends Migration
             $table->integer('member_id')->nullable();
             $table->integer('loan_scheme_id')->nullable();
             $table->double('loan_amount')->nullable();
+            $table->integer('no_of_years')->nullable();
             
             $table->string('name')->nullable();
             $table->string('description')->nullable();

@@ -8,6 +8,9 @@ use App\Models\MemberDb;
 use App\Models\Ec01LoanScheme;
 use App\Models\Ec03LoanRequest;
 use App\Models\Ec02LoanSchemeDetail;
+use App\Models\Ec04LoanRequestDetail;
+use App\Models\Ec06LoanAssignDetail;
+use App\Models\Ec07LoanEmiSchedule;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithPagination;
 
@@ -19,6 +22,7 @@ class Ec05LoanAssignComp extends Component
     public $members = [];
     public $loanSchemes = [];
     public $loanRequests = [];
+    public $allLoanRequests = [];
     public $schemeDetails = [];
 
     public $selectedMemberId = '';
@@ -47,6 +51,7 @@ class Ec05LoanAssignComp extends Component
     protected function rules()
     {
         return [
+            'selectedLoanRequestId' => 'required|integer|min:1',
             'selectedMemberId' => 'required|integer|min:1',
             'selectedLoanSchemeId' => 'required|integer|min:1',
             'loanAmount' => 'required|numeric|min:1',
@@ -66,9 +71,15 @@ class Ec05LoanAssignComp extends Component
 
     public function loadMembers()
     {
+        $memberIdsWithRequests = Ec03LoanRequest::withoutGlobalScopes()
+            ->whereIn('status', ['approved', 'pending'])
+            ->distinct()
+            ->pluck('member_id');
+
         $this->members = MemberDb::withoutGlobalScopes()
             ->select('id', 'name', 'member_type_id')
             ->with('memberType:id,name')
+            ->whereIn('id', $memberIdsWithRequests)
             ->orderBy('name')
             ->get();
     }
@@ -84,15 +95,36 @@ class Ec05LoanAssignComp extends Component
 
     public function loadLoanRequests()
     {
+        $assignedRequestIds = Ec05LoanAssign::withoutGlobalScopes()
+            ->whereNotNull('loan_request_id')
+            ->pluck('loan_request_id')
+            ->toArray();
+
         if (!empty($this->selectedMemberId)) {
             $this->loanRequests = Ec03LoanRequest::withoutGlobalScopes()
                 ->where('member_id', $this->selectedMemberId)
-                ->where('status', 'approved')
+                ->whereNotIn('id', $assignedRequestIds)
+                ->whereIn('status', ['approved', 'pending'])
                 ->orderBy('id', 'desc')
                 ->get();
         } else {
             $this->loanRequests = [];
         }
+    }
+
+    public function loadAllUnassignedLoanRequests()
+    {
+        $assignedRequestIds = Ec05LoanAssign::withoutGlobalScopes()
+            ->whereNotNull('loan_request_id')
+            ->pluck('loan_request_id')
+            ->toArray();
+
+        return Ec03LoanRequest::withoutGlobalScopes()
+            ->with(['member', 'loanScheme'])
+            ->whereNotIn('id', $assignedRequestIds)
+            ->whereIn('status', ['approved', 'pending'])
+            ->orderBy('id', 'desc')
+            ->get();
     }
 
     public function loadSchemeDetails()
@@ -126,7 +158,13 @@ class Ec05LoanAssignComp extends Component
             if ($loanRequest) {
                 $this->loanAmount = $loanRequest->loan_amount;
                 $this->selectedMemberId = $loanRequest->member_id;
+                $this->selectedLoanSchemeId = $loanRequest->loan_scheme_id;
+                $this->name = $loanRequest->name;
+                $this->description = $loanRequest->description;
+                $this->noOfEmi = $loanRequest->no_of_years * 12;
+                $this->isEmiEnabled = $loanRequest->emi_active;
                 $this->loadLoanRequests();
+                $this->loadSchemeDetails();
                 $this->calculateEmi();
             }
         }
@@ -179,14 +217,34 @@ class Ec05LoanAssignComp extends Component
             ->orderBy('id', 'desc')
             ->paginate(10);
 
-        return view('livewire.ec05-loan-assign-comp', ['loanAssigns' => $loanAssigns]);
+        return view('livewire.ec05-loan-assign-comp', [
+            'loanAssigns' => $loanAssigns,
+        ]);
     }
 
     public function create()
     {
         $this->resetInputFields();
+        $this->loadMembers();
+        $this->loadLoanSchemes();
+        $this->loadAllLoanRequests();
         $this->resetValidation();
         $this->openModal();
+    }
+
+    public function loadAllLoanRequests()
+    {
+        $assignedRequestIds = Ec05LoanAssign::withoutGlobalScopes()
+            ->whereNotNull('loan_request_id')
+            ->pluck('loan_request_id')
+            ->toArray();
+
+        $this->allLoanRequests = Ec03LoanRequest::withoutGlobalScopes()
+            ->with(['member', 'loanScheme'])
+            ->whereNotIn('id', $assignedRequestIds)
+            ->whereIn('status', ['approved', 'pending'])
+            ->orderBy('id', 'desc')
+            ->get();
     }
 
     public function openModal()
@@ -222,6 +280,7 @@ class Ec05LoanAssignComp extends Component
         $this->remarks = '';
         $this->status = 'pending';
         $this->loanRequests = [];
+        $this->allLoanRequests = [];
         $this->confirmingDelete = null;
     }
 
@@ -253,11 +312,73 @@ class Ec05LoanAssignComp extends Component
             'created_by' => $userId,
         ];
 
+        $loanAssign = null;
+
         if ($this->editId) {
-            Ec05LoanAssign::find($this->editId)->update($data);
+            $loanAssign = Ec05LoanAssign::find($this->editId);
+            $loanAssign->update($data);
             session()->flash('message', 'Loan Assign Updated Successfully.');
         } else {
-            Ec05LoanAssign::create($data);
+            $loanAssign = Ec05LoanAssign::create($data);
+
+            if (!empty($this->selectedLoanRequestId)) {
+                $requestDetails = Ec04LoanRequestDetail::where('loan_request_id', $this->selectedLoanRequestId)->get();
+                foreach ($requestDetails as $detail) {
+                    Ec06LoanAssignDetail::create([
+                        'loan_assign_id' => $loanAssign->id,
+                        'loan_scheme_detail_id' => $detail->loan_scheme_detail_id,
+                        'loan_scheme_detail_feature_id' => $detail->loan_scheme_feature_id,
+                        'loan_scheme_detail_feature_name' => $detail->loan_scheme_feature_name,
+                        'loan_scheme_detail_feature_value' => $detail->loan_scheme_feature_value,
+                        'loan_scheme_detail_feature_condition' => $detail->loan_scheme_feature_condition,
+                        'name' => $detail->name,
+                        'description' => $detail->description,
+                        'order_index' => $detail->order_index,
+                        'is_default' => $detail->is_default,
+                        'is_active' => $detail->is_active,
+                        'created_by' => $detail->created_by,
+                        'approved_by' => $detail->approved_by,
+                        'school_id' => $detail->school_id,
+                        'remarks' => $detail->remarks,
+                        'status' => $detail->status,
+                    ]);
+                }
+
+                Ec03LoanRequest::withoutGlobalScopes()->where('id', $this->selectedLoanRequestId)->update(['status' => 'completed']);
+            }
+
+            if ($this->isEmiEnabled && !empty($this->noOfEmi) && !empty($this->loanAmount)) {
+                $principal = floatval($this->loanAmount);
+                $interestRate = floatval($this->roi);
+                $monthlyRate = $interestRate / 12 / 100;
+                $totalMonths = intval($this->noOfEmi);
+                $monthlyEmi = floatval($this->emiAmount);
+
+                $firstEmiDueDate = !empty($this->loanAssignedDate) ? \Carbon\Carbon::parse($this->loanAssignedDate)->addMonth() : now()->addMonth();
+
+                for ($i = 1; $i <= $totalMonths; $i++) {
+                    $interestAmount = $principal * $monthlyRate;
+                    $principalAmount = $monthlyEmi - $interestAmount;
+                    $principal -= $principalAmount;
+
+                    Ec07LoanEmiSchedule::create([
+                        'loan_assign_id' => $loanAssign->id,
+                        'name' => 'EMI ' . $i,
+                        'emi_schedule_index' => $i,
+                        'emi_due_date' => $firstEmiDueDate->copy()->addMonths($i - 1)->toDateString(),
+                        'total_emi_amount' => $monthlyEmi,
+                        'principal_emi_amount' => round($principalAmount, 2),
+                        'interest_emi_amount' => round($interestAmount, 2),
+                        'principal_balance_amount_before_emi' => round($principal + $principalAmount, 2),
+                        'principal_balance_amount_after_emi' => round($principal, 2),
+                        'is_default' => false,
+                        'is_active' => true,
+                        'created_by' => $userId,
+                        'status' => 'pending',
+                    ]);
+                }
+            }
+
             session()->flash('message', 'Loan Assign Created Successfully.');
         }
 

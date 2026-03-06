@@ -93,6 +93,17 @@
                 </div>
                 <div class="p-4">
                     <form>
+                        <div class="mb-3">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Select Loan Request <span class="text-red-500">*</span></label>
+                            <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="selectedLoanRequestId">
+                                <option value="">Select Loan Request</option>
+                                @foreach($allLoanRequests as $request)
+                                    <option value="{{ $request->id }}">{{ $request->member->name ?? 'N/A' }} - {{ $request->loanScheme->name ?? 'N/A' }} - {{ number_format($request->loan_amount, 2) }}</option>
+                                @endforeach
+                            </select>
+                            @error('selectedLoanRequestId') <span class="text-red-500 text-xs">{{ $message }}</span>@enderror
+                        </div>
+
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Member <span class="text-red-500">*</span></label>
@@ -115,18 +126,6 @@
                                 @error('selectedLoanSchemeId') <span class="text-red-500 text-xs">{{ $message }}</span>@enderror
                             </div>
                         </div>
-
-                        @if(count($loanRequests) > 0)
-                        <div class="mt-3">
-                            <label class="block text-xs font-medium text-gray-600 mb-1">Link Loan Request</label>
-                            <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="selectedLoanRequestId">
-                                <option value="">Select Request (Optional)</option>
-                                @foreach($loanRequests as $request)
-                                    <option value="{{ $request->id }}">Loan #{{ $request->id }} - {{ number_format($request->loan_amount, 2) }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @endif
 
                         <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
