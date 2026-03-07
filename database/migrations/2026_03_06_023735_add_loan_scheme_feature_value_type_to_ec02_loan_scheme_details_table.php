@@ -6,11 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class AddLoanSchemeFeatureValueTypeToEc02LoanSchemeDetailsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
+    
     public function up()
     {
         Schema::table('ec02_loan_scheme_details', function (Blueprint $table) {
@@ -18,11 +14,7 @@ class AddLoanSchemeFeatureValueTypeToEc02LoanSchemeDetailsTable extends Migratio
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
+    
     public function down()
     {
         Schema::table('ec02_loan_scheme_details', function (Blueprint $table) {

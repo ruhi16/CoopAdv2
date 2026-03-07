@@ -47,4 +47,9 @@ class Ec03LoanRequest extends Model
     {
         return $this->hasMany(Ec07LoanEmiSchedule::class, 'loan_request_id');
     }
+
+    public function loanAssigns()
+    {
+        return $this->hasMany(Ec05LoanAssign::class, 'loan_request_id');
+    }
 }
