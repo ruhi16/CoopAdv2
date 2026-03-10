@@ -8,6 +8,8 @@ use App\Models\Ec04LoanRequestDetail;
 use App\Models\Ec05LoanAssign;
 use App\Models\Ec06LoanAssignDetail;
 use App\Models\Ec07LoanEmiSchedule;
+use App\Models\Ec11LoanPayment;
+use App\Models\Ec12LoanPaymentDetail;
 use Carbon\Carbon;
 use Livewire\WithPagination;
 
@@ -324,8 +326,34 @@ class Ec05LoanAssignComp extends Component
             }
         }
 
+        $this->createMockPaymentEntries($loanAssign);
+
         session()->flash('message', 'Loan Assigned Successfully.');
         $this->closeModal();
+    }
+
+    private function createMockPaymentEntries($loanAssign)
+    {
+        $loanPayment = Ec11LoanPayment::create([
+            'loan_assign_id' => $loanAssign->id,
+            'member_id' => $loanAssign->member_id,
+            'payment_total_amount' => $loanAssign->loan_amount,
+            'payment_date' => $loanAssign->loan_assigned_date,
+            'payment_method' => 'bank',
+            'is_paid' => true,
+            'principal_balance_amount_before_payment' => $loanAssign->loan_amount,
+            'principal_balance_amount_after_payment' => 0,
+            'is_active' => true,
+            'remarks' => 'Mock payment entry created on loan assignment',
+        ]);
+
+        Ec12LoanPaymentDetail::create([
+            'loan_payment_id' => $loanPayment->id,
+            'loan_emi_schedule_id' => null,
+            'loan_assign_detail_amount' => 0,
+            'is_active' => true,
+            'remarks' => 'Mock payment detail entry',
+        ]);
     }
 
     public function isShortTerm($noOfYears)
