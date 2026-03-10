@@ -19,6 +19,7 @@ class CreateEc03LoanRequestsTable extends Migration
             $table->integer('loan_scheme_id')->nullable();
             $table->double('loan_amount')->nullable();
             $table->integer('no_of_years')->nullable();
+            $table->boolean('emi_active')->default(false);
             
             $table->string('name')->nullable();
             $table->string('description')->nullable();

@@ -65,9 +65,25 @@
             <div class="text-gray-600">
                 @if($activeMenu === 'dashboard')
                     <p>Welcome to your dashboard. Here you can see an overview of your application.</p>
-                    {{-- @livewire('bs-school-comp') --}}
-                    {{-- @livewire('bs02-financialyear-comp') --}}
-                    {{-- @livewire('bs05-member-type-comp') --}}
+                    <p>Quick links:</p>
+                    @livewire('wf01-task-category-comp')
+                    @livewire('wf02-task-event-comp')
+                    @livewire('wf03-task-event-phase-comp')
+                    @livewire('wf04-task-event-phase-table-comp')
+                    @livewire('wf04-task-event-phase-table-operation-comp')
+                    @livewire('wf04-task-event-phase-table-operation-status-comp')
+
+                    @livewire('wf07-task-defination-comp')
+                    @livewire('wf07-task-defination-detail-comp')
+
+
+                    @livewire('wf09-task-execution-comp')
+                    {{-- @livewire('wf09-task-execution-detail-comp') --}}
+                    {{-- @livewire('wf09-task-execution-detail-status-comp') --}}
+
+                    @livewire('bs-school-comp')
+                    @livewire('bs02-financialyear-comp')
+                    @livewire('bs05-member-type-comp')
                     @livewire('bs06-member-db-comp')
                     {{-- @livewire('bs07-member-cr-comp')  --}}
                     @livewire('ec01-loan-scheme-comp')

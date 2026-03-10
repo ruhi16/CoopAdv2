@@ -37,8 +37,8 @@ class CreateEc11LoanPaymentsTable extends Migration
             $table->boolean('is_paid')->default(false);
 
 
-            $table->double('principal_balance_amount_after_payment')->nullable();
             $table->double('principal_balance_amount_before_payment')->nullable();
+            $table->double('principal_balance_amount_after_payment')->nullable();
 
             $table->integer('financial_year_id')->nullable();
 
