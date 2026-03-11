@@ -66,6 +66,13 @@
                 @if($activeMenu === 'dashboard')
                     <p>Welcome to your dashboard. Here you can see an overview of your application.</p>
                     <p>Quick links:</p>
+                    @livewire('ec21-bank-loan-scheme-specification-particular-comp')
+                    @livewire('ec21-bank-loan-scheme-comp')
+                    @livewire('ec21-bank-loan-borrowed-comp')
+                    @livewire('ec23-bank-loan-payment-comp')
+
+
+
 
                 @elseif($activeMenu === 'task_management')
                     @livewire('wf09-task-execution-comp')
