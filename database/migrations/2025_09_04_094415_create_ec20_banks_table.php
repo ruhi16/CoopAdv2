@@ -16,9 +16,7 @@ class CreateEc20BanksTable extends Migration
         Schema::create('ec20_banks', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description')->nullable();
-
-              
+            $table->string('description')->nullable();             
             
 
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');

@@ -66,6 +66,15 @@
                 @if($activeMenu === 'dashboard')
                     <p>Welcome to your dashboard. Here you can see an overview of your application.</p>
                     <p>Quick links:</p>
+
+                @elseif($activeMenu === 'task_management')
+                    @livewire('wf09-task-execution-comp')
+                {{-- @livewire('wf09-task-execution-detail-comp') --}}
+                {{-- @livewire('wf09-task-execution-detail-status-comp') --}}
+
+                    @livewire('wf07-task-defination-comp')
+                    @livewire('wf07-task-defination-detail-comp')
+
                     @livewire('wf01-task-category-comp')
                     @livewire('wf02-task-event-comp')
                     @livewire('wf03-task-event-phase-comp')
@@ -73,19 +82,20 @@
                     @livewire('wf04-task-event-phase-table-operation-comp')
                     @livewire('wf04-task-event-phase-table-operation-status-comp')
 
-                    @livewire('wf07-task-defination-comp')
-                    @livewire('wf07-task-defination-detail-comp')
 
 
-                    @livewire('wf09-task-execution-comp')
-                    {{-- @livewire('wf09-task-execution-detail-comp') --}}
-                    {{-- @livewire('wf09-task-execution-detail-status-comp') --}}
 
+                @elseif($activeMenu === 'basic')
                     @livewire('bs-school-comp')
                     @livewire('bs02-financialyear-comp')
                     @livewire('bs05-member-type-comp')
                     @livewire('bs06-member-db-comp')
                     {{-- @livewire('bs07-member-cr-comp')  --}}
+                @elseif($activeMenu === 'bank')
+                    @livewire('ec20-bank-comp')
+                    @livewire('ec20-bank-detail-comp')
+
+                @elseif($activeMenu === 'loans_to_members')
                     @livewire('ec01-loan-scheme-comp')
                     @livewire('ec02-loan-scheme-feature-comp')
                     @livewire('ec02-loan-scheme-detail-comp')

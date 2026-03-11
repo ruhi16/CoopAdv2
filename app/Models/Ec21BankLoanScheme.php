@@ -39,7 +39,7 @@ class Ec21BankLoanScheme extends Model
      */
     public function organisation()
     {
-        return $this->belongsTo(Ec01Organisation::class, 'organisation_id');
+        return $this->belongsTo(School::class, 'organisation_id');
     }
     
     /**
@@ -47,9 +47,17 @@ class Ec21BankLoanScheme extends Model
      */
     public function financialYear()
     {
-        return $this->belongsTo(Ec02FinancialYear::class, 'financial_year_id');
+        return $this->belongsTo(FinancialYear::class, 'financial_year_id');
     }
     
+    /**
+     * Get the specifications for the loan scheme.
+     */
+    public function specifications()
+    {
+        return $this->hasMany(Ec21BankLoanSchemeSpecification::class, 'bank_loan_scheme_id');
+    }
+
     /**
      * Get the user who finalized the loan scheme
      */

@@ -12,5 +12,8 @@ class Ec20Bank extends Model
 
 
 
-    
+    public function details()
+    {
+        return $this->hasMany(Ec20BankDetail::class, 'bank_id');
+    }
 }
