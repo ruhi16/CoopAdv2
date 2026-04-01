@@ -98,6 +98,14 @@
                     @livewire('bs05-member-type-comp')
                     @livewire('bs06-member-db-comp')
                     {{-- @livewire('bs07-member-cr-comp')  --}}
+
+
+                @elseif($activeMenu === 'thrift_fund')
+                    @livewire('ec15-thfund-master-db-comp')
+                    @livewire('ec15-thfund-specification-comp')
+                    @livewire('ec15-thfund-transaction-comp')
+
+
                 @elseif($activeMenu === 'bank')
                     @livewire('ec20-bank-comp')
                     @livewire('ec20-bank-detail-comp')
@@ -109,6 +117,16 @@
 
                     @livewire('ec03-loan-request-comp')
                     @livewire('ec05-loan-assign-comp')
+
+                @elseif($activeMenu === 'member_share_fund')
+                    @livewire('ec16-shfund-member-master-db-comp')
+                    @livewire('ec16-shfund-member-specification-comp')
+                    @livewire('ec16-shfund-member-transaction-comp')
+
+                @elseif($activeMenu === 'bank_share_fund')
+                    @livewire('ec17-shfund-bank-master-db-comp')
+                    @livewire('ec17-shfund-bank-specification-comp')
+                    @livewire('ec17-shfund-bank-transaction-comp')
 
                 @elseif($activeMenu === 'products')
                     @if($activeSubMenu === 'all-products')
