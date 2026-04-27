@@ -5,140 +5,140 @@ ORDER BY m.id, stp.colDate;
 
 -- Narayan Barman
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (13, 1, 1, 75000, 50000, '2026-04-01 00:00:00');
+VALUES (1, 1, 1, 75000, 50000, '2026-04-01 00:00:00');
 
 -- Ganesh Chandra Mondal
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (16, 1, 1, 50000, 5000, '2026-04-01 00:00:00');
+VALUES (2, 1, 1, 50000, 5000, '2026-04-01 00:00:00');
 
 -- Md. Abdul Momen (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (17, 1, 1, 50000, 50000, '2026-04-01 00:00:00');
+VALUES (3, 1, 1, 50000, 50000, '2026-04-01 00:00:00');
 
 -- Md. Abdul Momen (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (17, 1, 1, 50000, 16000, '2026-04-01 00:00:00');
+VALUES (3, 1, 1, 50000, 16000, '2026-04-01 00:00:00');
 
 -- Navid Anjum (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (18, 1, 1, 25000, 12000, '2026-04-01 00:00:00');
+VALUES (4, 1, 1, 25000, 12000, '2026-04-01 00:00:00');
 
 -- Navid Anjum (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (18, 1, 1, 31000, 30000, '2026-04-01 00:00:00');
+VALUES (4, 1, 1, 31000, 30000, '2026-04-01 00:00:00');
 
 -- Soumen Mondal
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (21, 1, 1, 75000, 60000, '2026-04-01 00:00:00');
+VALUES (5, 1, 1, 75000, 60000, '2026-04-01 00:00:00');
 
 -- Md Abdur Rouf (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (22, 1, 1, 50000, 19000, '2026-04-01 00:00:00');
+VALUES (6, 1, 1, 50000, 19000, '2026-04-01 00:00:00');
 
 -- Md Abdur Rouf (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (22, 1, 1, 50000, 41000, '2026-04-01 00:00:00');
+VALUES (6, 1, 1, 50000, 41000, '2026-04-01 00:00:00');
 
 -- Md. Mukhlesur Rahaman (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (26, 1, 1, 37000, 33000, '2026-04-01 00:00:00');
+VALUES (7, 1, 1, 37000, 33000, '2026-04-01 00:00:00');
 
 -- Md. Mukhlesur Rahaman (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (26, 1, 1, 40000, 23000, '2026-04-01 00:00:00');
+VALUES (7, 1, 1, 40000, 23000, '2026-04-01 00:00:00');
 
 -- Md Sarifuzzaman (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (27, 1, 1, 39000, 7000, '2026-04-01 00:00:00');
+VALUES (8, 1, 1, 39000, 7000, '2026-04-01 00:00:00');
 
 -- Md Sarifuzzaman (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (27, 1, 1, 32117, 32000, '2026-04-01 00:00:00');
+VALUES (8, 1, 1, 32117, 32000, '2026-04-01 00:00:00');
 
 -- Md Sarifuzzaman (Entry 3)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (27, 1, 1, 30000, 24000, '2026-04-01 00:00:00');
+VALUES (8, 1, 1, 30000, 24000, '2026-04-01 00:00:00');
 
 -- Rajes Upadhyay (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (28, 1, 1, 25000, 23000, '2026-04-01 00:00:00');
+VALUES (9, 1, 1, 25000, 23000, '2026-04-01 00:00:00');
 
 -- Rajes Upadhyay (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (28, 1, 1, 25000, 25000, '2026-04-01 00:00:00');
+VALUES (9, 1, 1, 25000, 25000, '2026-04-01 00:00:00');
 
 -- Hari Narayan Das
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (30, 1, 1, 75000, 74500, '2026-04-01 00:00:00');
+VALUES (10, 1, 1, 75000, 74500, '2026-04-01 00:00:00');
 
 -- Md Abul Fazal (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (32, 1, 1, 37500, 31000, '2026-04-01 00:00:00');
+VALUES (12, 1, 1, 37500, 31000, '2026-04-01 00:00:00');
 
 -- Md Abul Fazal (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (32, 1, 1, 50000, 36000, '2026-04-01 00:00:00');
+VALUES (12, 1, 1, 50000, 36000, '2026-04-01 00:00:00');
 
 -- Md Sabir Ahammed
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (35, 1, 1, 75000, 50000, '2026-04-01 00:00:00');
+VALUES (13, 1, 1, 75000, 50000, '2026-04-01 00:00:00');
 
 -- Sk Abdul Aziz
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (45, 1, 1, 50000, 30000, '2026-04-01 00:00:00');
+VALUES (15, 1, 1, 50000, 30000, '2026-04-01 00:00:00');
 
 -- Shubankar Bhattacharia
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (46, 1, 1, 75000, 73500, '2026-04-01 00:00:00');
+VALUES (16, 1, 1, 75000, 73500, '2026-04-01 00:00:00');
 
 -- Md Ansarul Haque (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (47, 1, 1, 32000, 29500, '2026-04-01 00:00:00');
+VALUES (17, 1, 1, 32000, 29500, '2026-04-01 00:00:00');
 
 -- Md Ansarul Haque (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (47, 1, 1, 50000, 40500, '2026-04-01 00:00:00');
+VALUES (17, 1, 1, 50000, 40500, '2026-04-01 00:00:00');
 
 -- Md Golam Mozaddid
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (49, 1, 1, 75000, 62000, '2026-04-01 00:00:00');
+VALUES (19, 1, 1, 75000, 62000, '2026-04-01 00:00:00');
 
 -- Md Gajikul Islam (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (50, 1, 1, 37500, 35500, '2026-04-01 00:00:00');
+VALUES (20, 1, 1, 37500, 35500, '2026-04-01 00:00:00');
 
 -- Md Gajikul Islam (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (50, 1, 1, 50000, 33500, '2026-04-01 00:00:00');
+VALUES (20, 1, 1, 50000, 33500, '2026-04-01 00:00:00');
 
 -- Md Ismail Hoque
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (52, 1, 1, 50000, 6000, '2026-04-01 00:00:00');
+VALUES (22, 1, 1, 50000, 6000, '2026-04-01 00:00:00');
 
 -- Md Ziaul Hoque (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (53, 1, 1, 27500, 19500, '2026-04-01 00:00:00');
+VALUES (23, 1, 1, 27500, 19500, '2026-04-01 00:00:00');
 
 -- Md Ziaul Hoque (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (53, 1, 1, 50000, 45500, '2026-04-01 00:00:00');
+VALUES (23, 1, 1, 50000, 45500, '2026-04-01 00:00:00');
 
 -- Arjina Khatun (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (56, 1, 1, 50000, 14500, '2026-04-01 00:00:00');
+VALUES (26, 1, 1, 50000, 14500, '2026-04-01 00:00:00');
 
 -- Arjina Khatun (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (56, 1, 1, 25000, 20500, '2026-04-01 00:00:00');
+VALUES (26, 1, 1, 25000, 20500, '2026-04-01 00:00:00');
 
 -- Md Jamaluddin (Entry 1)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (58, 1, 1, 27500, 18500, '2026-04-01 00:00:00');
+VALUES (27, 1, 1, 27500, 18500, '2026-04-01 00:00:00');
 
 -- Md Jamaluddin (Entry 2)
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (58, 1, 1, 50000, 45500, '2026-04-01 00:00:00');
+VALUES (27, 1, 1, 50000, 45500, '2026-04-01 00:00:00');
 
 -- Samima Khatun
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
-VALUES (62, 1, 1, 50000, 24000, '2026-04-01 00:00:00');
+VALUES (31, 1, 1, 50000, 24000, '2026-04-01 00:00:00');
