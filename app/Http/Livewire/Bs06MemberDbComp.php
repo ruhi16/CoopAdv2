@@ -71,6 +71,15 @@ class Bs06MemberDbComp extends Component
             'pan_no' => 'nullable|string|max:10',
             'aadhar_no' => 'nullable|string|max:12',
             'voter_id_no' => 'nullable|string|max:20',
+            'account_bank' => 'nullable|string|max:255',
+            'account_branch' => 'nullable|string|max:255',
+            'account_no' => 'nullable|string|max:255',
+            'account_ifsc' => 'nullable|string|max:11',
+            'account_micr' => 'nullable|string|max:10',
+            'account_customer_id' => 'nullable|string|max:255',
+            'account_holder_name' => 'nullable|string|max:255',
+            'is_default' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
         ];
     }
 
@@ -85,7 +94,7 @@ class Bs06MemberDbComp extends Component
                       ->orWhere('email', 'like', '%' . $this->search . '%')
                       ->orWhere('mobile', 'like', '%' . $this->search . '%');
             })
-            ->orderBy('id', 'desc')
+            ->orderBy('id', 'asc')
             ->paginate(10);
 
         return view('livewire.bs06-member-db-comp', compact('memberDbs', 'memberTypes'));

@@ -66,10 +66,7 @@
                 @if($activeMenu === 'dashboard')
                     <p>Welcome to your dashboard. Here you can see an overview of your application.</p>
                     <p>Quick links:</p>
-                    @livewire('ec21-bank-loan-scheme-specification-particular-comp')
-                    @livewire('ec21-bank-loan-scheme-comp')
-                    @livewire('ec21-bank-loan-borrowed-comp')
-                    @livewire('ec23-bank-loan-payment-comp')
+                    
 
 
 
@@ -97,7 +94,7 @@
                     @livewire('bs02-financialyear-comp')
                     @livewire('bs05-member-type-comp')
                     @livewire('bs06-member-db-comp')
-                    {{-- @livewire('bs07-member-cr-comp')  --}}
+                    @livewire('bs07-member-cr-comp') 
 
 
                 @elseif($activeMenu === 'thrift_fund')
@@ -109,6 +106,12 @@
                 @elseif($activeMenu === 'bank')
                     @livewire('ec20-bank-comp')
                     @livewire('ec20-bank-detail-comp')
+
+                @elseif($activeMenu === 'bank_loans_borrowed')
+                    @livewire('ec21-bank-loan-scheme-specification-particular-comp')
+                    @livewire('ec21-bank-loan-scheme-comp')
+                    @livewire('ec21-bank-loan-borrowed-comp')
+                    @livewire('ec23-bank-loan-payment-comp')
 
                 @elseif($activeMenu === 'loans_to_members')
                     @livewire('ec01-loan-scheme-comp')

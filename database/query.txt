@@ -1,0 +1,4 @@
+SELECT st.id, m.id, m.Name, st.LoanAmt, st.LoanInt, st.CurrBal, stp.roi, stp.prnAmt, stp.intAmt, stp.Total, stp.forMonth, stp.forYear, stp.currBal, stp.colDate
+FROM stloanassign st, members m, stloanpayment stp
+WHERE st.mId = m.id AND st.Id = stp.LId AND stp.colDate >= '2026-04-01 00:00:00'
+ORDER BY m.id, stp.colDate;
