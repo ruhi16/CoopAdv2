@@ -95,8 +95,8 @@
                     <table class="min-w-full text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-3 py-2 text-left font-medium text-gray-600">No.</th>
-                                <th class="px-3 py-2 text-left font-medium text-gray-600">Member</th>
+                                <th class="px-3 py-2 text-left font-medium text-gray-600">Sl/LID</th>
+                                <th class="px-3 py-2 text-left font-medium text-gray-600">Id Member</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">Scheme</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">Loan Amount</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">ROI</th>
@@ -112,11 +112,19 @@
                         <tbody class="divide-y divide-gray-200">
                             @foreach($assignedLoans as $assign)
                                 <tr class="hover:bg-gray-50">
-                                    <td class="px-3 py-2">{{ $loop->iteration }}</td>
-                                    <td class="px-3 py-2">{{ $assign['member']['name'] ?? '-' }}</td>
-                                    <td class="px-3 py-2">{{ $assign['loan_scheme']['name'] ?? '-' }}</td>
+                                    <td class="px-3 py-2">{{ $loop->iteration }} / {{ $assign['id'] }}</td>
+                                    <td class="px-3 py-2">
+                                        <span class="text-sm text-gray-500">{{ $assign['member']['id'] ?? '-' }}</span>
+                                        {{ $assign['member']['name'] ?? '-' }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ $assign['loan_id'] ?? '-' }} --
+                                        {{ $assign['loan_scheme']['name'] ?? '-' }}</td>
                                     <td class="px-3 py-2">{{ number_format($assign['loan_amount'], 2) }}</td>
-                                    <td class="px-3 py-2">{{ $assign['roi'] ?? 0 }}%</td>
+                                    <td class="px-3 py-2">
+                                        {{-- {{ json_encode($assign, true) ?? '-' }}% --}}
+                                        {{ $assign['roi'] ?? 0 }}%
+                                    </td>
                                     <td class="px-3 py-2">{{ $assign['no_of_emi'] ?? 0 }} mo</td>
                                     <td class="px-3 py-2">{{ number_format($assign['emi_amount'], 2) }}</td>
                                     <td class="px-3 py-2">{{ number_format(($assign['emi_amount'] ?? 0) * ($assign['no_of_emi'] ?? 0), 2) }}</td>
@@ -126,7 +134,7 @@
                                         @if($assign['status'] == 'Assigned')
                                             <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Assigned</span>
                                         @else
-                                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">{{ $assign['status'] }}</span>
+                                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">{{ $assign['status'] ?? '-' }}</span>
                                         @endif
                                     </td>
                                     <td class="px-3 py-2">

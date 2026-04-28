@@ -75,21 +75,34 @@ class Ec05LoanAssignComp extends Component
             ->when($this->status, function ($query) {
                 $query->where('status', $this->status);
             })
-            ->orderBy('id', 'desc')
+            ->orderBy('id', 'asc')
             ->paginate(10);
 
         $this->assignedLoans = Ec05LoanAssign::with(['member', 'loanScheme', 'loanAssignDetails', 'emiSchedules'])
-            ->orderBy('id', 'desc')
+            ->orderBy('id', 'asc')
             ->get()
             ->map(function ($loan) {
+                // dd($loan);
+                // $loan is an object of Ec05LoanAssign, it has a relationship with loanAssignDetails, emiSchedules
+                // that exists as $loan->loanAssignDetails, $loan->emiSchedules
+                $loan->loan_id = $loan->id;
                 $loan->loan_amount = (float) $loan->loan_amount;
                 $loan->loan_current_balance = (float) $loan->loan_current_balance;
-                $loan->roi = (float) $loan->roi;
+                // $loan->roi = (float) $loan['member']['id'] ?? 0;
+                // $loan->roi = (float) $loan['loanAssignDetails']['loan_scheme_detail_feature_value'] ?? 0;
+                $loan->roi =  $loan->loanAssignDetails
+                    // ->where('loan_assign_id', $loan->id)
+                    ->where('loan_scheme_detail_feature_id', 1) // 1 for roi
+                    ->first()  
+                    ->value('loan_scheme_detail_feature_value')  ?? 0;
+
                 $loan->emi_amount = (float) $loan->emi_amount;
                 $loan->no_of_emi = (int) $loan->no_of_emi;
                 return $loan;
             })
             ->toArray();
+
+            // dd(json_encode($this->assignedLoans));
 
         return view('livewire.ec05-loan-assign-comp', compact('unassignedLoans'));
     }
