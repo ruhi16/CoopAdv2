@@ -90,11 +90,10 @@ class Ec05LoanAssignComp extends Component
                 $loan->loan_current_balance = (float) $loan->loan_current_balance;
                 // $loan->roi = (float) $loan['member']['id'] ?? 0;
                 // $loan->roi = (float) $loan['loanAssignDetails']['loan_scheme_detail_feature_value'] ?? 0;
-                $loan->roi =  $loan->loanAssignDetails
-                    // ->where('loan_assign_id', $loan->id)
+                $loan->roi = (float) $loan->loanAssignDetails
                     ->where('loan_scheme_detail_feature_id', 1) // 1 for roi
-                    ->first()  
-                    ->value('loan_scheme_detail_feature_value')  ?? 0;
+                    ->first()
+                    ->loan_scheme_detail_feature_value ?? 0;  
 
                 $loan->emi_amount = (float) $loan->emi_amount;
                 $loan->no_of_emi = (int) $loan->no_of_emi;
