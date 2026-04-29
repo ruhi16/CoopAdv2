@@ -147,7 +147,8 @@
                     @endif
 
                 @elseif($activeMenu === 'member_loan_payments')
-                    @livewire('ec11-loan-payment-comp')
+                    <!-- @livewire('ec11-loan-payment-comp') -->
+                    @livewire('ec11-loan-payment-comp2')
                     
 
 
