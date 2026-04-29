@@ -35,12 +35,12 @@ class Ec03LoanRequest extends Model
 
     public function loanScheme()
     {
-        return $this->belongsTo(Ec01LoanScheme::class, 'loan_scheme_id');
+        return $this->belongsTo(Ec01LoanScheme::class, 'loan_scheme_id', 'id');
     }
 
     public function loanRequestDetails()
     {
-        return $this->hasMany(Ec04LoanRequestDetail::class, 'loan_request_id');
+        return $this->hasMany(Ec04LoanRequestDetail::class, 'loan_request_id', 'id');
     }
 
     public function emiSchedules()

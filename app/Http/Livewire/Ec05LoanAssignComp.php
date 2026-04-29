@@ -74,10 +74,21 @@ class Ec05LoanAssignComp extends Component
             })
             ->when($this->status, function ($query) {
                 $query->where('status', $this->status);
-            })
+            })            
             ->orderBy('id', 'asc')
-            ->paginate(10);
-
+            ->get()
+            ->map(function ($loan) {
+                $loan->roi = (float) $loan->loanRequestDetails
+                    ->where('loan_scheme_feature_id', 1) // 1 for roi
+                    ->first()
+                    ->loan_scheme_feature_value ?? 0;
+                // $loan->loanRequestDetails = $loan->loanRequestDetails->toArray();
+                return $loan;
+            })
+            ->toArray()
+            ;
+            // ->paginate(10);
+            // dd($unassignedLoans);
         $this->assignedLoans = Ec05LoanAssign::with(['member', 'loanScheme', 'loanAssignDetails', 'emiSchedules'])
             ->orderBy('id', 'asc')
             ->get()
@@ -354,7 +365,7 @@ class Ec05LoanAssignComp extends Component
             'payment_method' => 'bank',
             'is_paid' => true,
             'principal_balance_amount_before_payment' => $loanAssign->loan_amount,
-            'principal_balance_amount_after_payment' => 0,
+            'principal_balance_amount_after_payment' => $loanAssign->loan_amount,
             'is_active' => true,
             'remarks' => 'Mock payment entry created on loan assignment',
         ]);

@@ -24,4 +24,19 @@ class Ec01LoanScheme extends Model
         'remarks',
         'status',
     ];
+
+    public function loanSchemeFeatures()
+    {
+        return $this->hasMany(Ec02LoanSchemeDetail::class, 'loan_scheme_id', 'id');
+    }
+
+
+    public function loanScheme()
+    {
+        return $this->hasMany(Ec03LoanRequest::class, 'loan_scheme_id', 'id');
+    }
+
+
+
+
 }

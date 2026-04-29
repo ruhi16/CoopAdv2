@@ -24,11 +24,11 @@
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-gray-100">
                         <tr>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">No.</th>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Name</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Member</th>
+                            <th class="px-3 py-2 text-left font-medium text-gray-600">ROI</th>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Scheme</th>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Amount</th>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Years</th>
@@ -40,31 +40,40 @@
                     <tbody class="divide-y divide-gray-200">
                         @forelse ($unassignedLoans as $loan)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-3 py-2">{{ $loop->iteration + ($unassignedLoans->currentPage() - 1) * $unassignedLoans->perPage() }}</td>
-                                <td class="px-3 py-2">{{ $loan->name }}</td>
-                                <td class="px-3 py-2">{{ $loan->member->name ?? '-' }}</td>
-                                <td class="px-3 py-2">{{ $loan->loanScheme->name ?? '-' }}</td>
-                                <td class="px-3 py-2">{{ number_format($loan->loan_amount, 2) }}</td>
-                                <td class="px-3 py-2">{{ $loan->no_of_years ?? 0 }}</td>
+                                {{-- <td class="px-3 py-2">{{ $loop->iteration + ($unassignedLoans->currentPage() - 1) * $unassignedLoans->perPage() }}</td> --}}
+                                <td class="px-3 py-2">{{ $loop->iteration }}</td>
+                                <td class="px-3 py-2">{{ $loan['member']['name'] ?? '-' }}</td>
                                 <td class="px-3 py-2">
-                                    @if($loan->status == 'Approved')
+                                    {{ $loan['roi'] ?? '-' }}%
+                                    @if($loan['loan_request_details'])
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
+                                    @endif
+                                </td>
+                                {{-- <td class="px-3 py-2">{{ json_encode($loan['loan_request_details']) ?? '-' }}</td> --}}
+                                {{-- <td class="px-3 py-2">{{ $loan['id'] ?? '-' }}</td> --}}
+                                <td class="px-3 py-2">{{ $loan['loan_scheme']['name'] ?? '-' }}</td>
+                                <td class="px-3 py-2">{{ number_format($loan['loan_amount'], 2) }}</td>
+                                <td class="px-3 py-2">{{ $loan['no_of_years'] ?? 0 }}</td>
+                                <td class="px-3 py-2">
+                                    {{-- {{ $loan->roi ?? '-' }} --}}
+                                    @if($loan['status'] == 'Approved')
                                         <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
-                                    @elseif($loan->status == 'Rejected')
+                                    @elseif($loan['status'] == 'Rejected')
                                         <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
                                     @else
                                         <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
                                     @endif
                                 </td>
                                 <td class="px-3 py-2">
-                                    @if($loan->is_active)
+                                    @if($loan['is_active'])
                                         <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Active</span>
                                     @else
                                         <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Inactive</span>
                                     @endif
                                 </td>
                                 <td class="px-3 py-2">
-                                    @if($loan->no_of_years > 1 && $loan->no_of_years <= 5)
-                                        <button class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700" wire:click="openAssignModal({{ $loan->id }})">Loan Assign</button>
+                                    @if($loan['no_of_years'] > 1 && $loan['no_of_years'] <= 5)
+                                        <button class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700" wire:click="openAssignModal({{ $loan['id'] }})">Loan Assign</button>
                                     @else
                                         <button class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700" wire:click="openAssignModal({{ $loan->id }})">Loan Assign</button>
                                     @endif
@@ -80,7 +89,7 @@
             </div>
 
             <div class="mt-4">
-                {{ $unassignedLoans->links() }}
+                {{-- {{ $unassignedLoans->links() }} --}}
             </div>
         </div>
     </div>

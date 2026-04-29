@@ -113,13 +113,13 @@
                     @livewire('ec21-bank-loan-borrowed-comp')
                     @livewire('ec23-bank-loan-payment-comp')
 
-                @elseif($activeMenu === 'loans_to_members')
-                @livewire('ec02-loan-scheme-detail-comp')
-                    @livewire('ec01-loan-scheme-comp')
-                    @livewire('ec02-loan-scheme-feature-comp')
-
+                @elseif($activeMenu === 'loans_to_members')                
                     @livewire('ec03-loan-request-comp')
                     @livewire('ec05-loan-assign-comp')
+
+                    @livewire('ec01-loan-scheme-comp')
+                    @livewire('ec02-loan-scheme-detail-comp')
+                    @livewire('ec02-loan-scheme-feature-comp')
 
                 @elseif($activeMenu === 'member_share_fund')
                     @livewire('ec16-shfund-member-master-db-comp')
@@ -146,12 +146,13 @@
 
                     @endif
 
-                @elseif($activeMenu === 'loan_payments_collection')
-                    @livewire('ec23-bank-loan-payment-comp')
+                @elseif($activeMenu === 'member_loan_payments')
+                    @livewire('ec11-loan-payment-comp')
                     
 
 
-                @elseif($activeMenu === 'loan_payments_distribution')
+                @elseif($activeMenu === 'bank_borrowed_loan_payments')
+                    {{-- @livewire('ec23-loan-payment-comp') --}}
 
 
 
