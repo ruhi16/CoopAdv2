@@ -56,7 +56,10 @@
                                         wire:click="toggleLoanSelection({{ $loan['id'] }})">
                                 </td>
                                 <td class="px-2 py-2">{{ $index + 1 }}</td>
-                                <td class="px-2 py-2">{{ $loan['member_name'] }}</td>
+                                <td class="px-2 py-2">
+                                    {{ $loan['member_id'] }} {{ $loan['member_name'] }}
+                                    ({{ $loan['id'] }})
+                                </td>
                                 <td class="px-2 py-2">{{ $loan['name'] }}</td>
                                 <td class="px-2 py-2">{{ $loan['scheme_name'] }}</td>
                                 <td class="px-2 py-2 text-right">{{ number_format($loan['loan_amount'], 2) }}</td>

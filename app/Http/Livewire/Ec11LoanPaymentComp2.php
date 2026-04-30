@@ -126,6 +126,7 @@ class Ec11LoanPaymentComp2 extends Component
             $this->loanData[] = [
                 'id' => $loan->id,
                 'name' => $loan->name,
+                'member_id' => $loan->member->id ?? '-',
                 'member_name' => $loan->member->name ?? '-',
                 'scheme_name' => $loan->loanScheme->name ?? '-',
                 'loan_amount' => $loan->loan_amount,
@@ -310,7 +311,7 @@ class Ec11LoanPaymentComp2 extends Component
         $this->remarks = '';
     }
 
-    public function store()
+public function store()
     {
         $this->validate();
 
@@ -318,8 +319,6 @@ class Ec11LoanPaymentComp2 extends Component
             $this->confirmingPayment = true;
             return;
         }
-
-        $userId = Auth::id() ?? 1;
 
         foreach ($this->selectedLoans as $loanId) {
             $paymentData = $this->calculatedPayments[$loanId] ?? null;
@@ -341,7 +340,7 @@ class Ec11LoanPaymentComp2 extends Component
             // Update balance after principal payment
             $balanceAfterPayment = $currentBalance - $principalAmount;
 
-            $payment = Ec11LoanPayment::create([
+$payment = Ec11LoanPayment::create([
                 'loan_assign_id' => $loanId,
                 'member_id' => $loan->member_id,
                 'payment_total_amount' => $payAmount,
@@ -354,38 +353,37 @@ class Ec11LoanPaymentComp2 extends Component
                 'remarks' => $this->remarks,
             ]);
 
-            // Save details
+            // Save detail for principal amount
             if ($principalAmount > 0) {
                 Ec12LoanPaymentDetail::create([
                     'loan_payment_id' => $payment->id,
-                    'feature_type' => 'principal',
-                    'loan_emi_principal_amount' => $principalAmount,
+                    'loan_assign_detail_amount' => $principalAmount,
                     'is_active' => true,
-                    'user_id' => $userId,
+                    'remarks' => 'Principal Payment',
                 ]);
             }
 
+            // Save detail for interest amount
             if ($interestAmount > 0) {
                 Ec12LoanPaymentDetail::create([
                     'loan_payment_id' => $payment->id,
-                    'feature_type' => 'interest',
-                    'loan_emi_interest_amount' => $interestAmount,
+                    'loan_assign_detail_amount' => $interestAmount,
                     'is_active' => true,
-                    'user_id' => $userId,
+                    'remarks' => 'Interest Payment',
                 ]);
             }
 
+            // Save detail for other amounts
             if ($otherAmount > 0) {
                 Ec12LoanPaymentDetail::create([
                     'loan_payment_id' => $payment->id,
-                    'feature_type' => 'other',
-                    'loan_emi_other_amount' => $otherAmount,
+                    'loan_assign_detail_amount' => $otherAmount,
                     'is_active' => true,
-                    'user_id' => $userId,
+                    'remarks' => 'Other Charges Payment',
                 ]);
             }
 
-            // Optional: Update loan balance in Ec05LoanAssign if it exists
+            // Update loan balance in Ec05LoanAssign if it exists
             if (isset($loan->loan_current_balance)) {
                 $loan->update(['loan_current_balance' => $balanceAfterPayment]);
             }
