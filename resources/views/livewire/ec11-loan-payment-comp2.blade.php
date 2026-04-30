@@ -111,8 +111,8 @@
                                         <strong>Payment History:</strong>
                                         @foreach($loan['payment_history'] as $payment)
                                             <span class="mr-2">
-                                                {{ date('d-m-Y', strtotime($payment->payment_date)) }}: 
-                                                {{ number_format($payment->payment_total_amount, 2) }}
+                                                {{ date('d-m-Y', strtotime($payment['payment_date'])) }}: 
+                                                {{ number_format($payment['payment_total_amount'], 2) }}
                                             </span>
                                         @endforeach
                                     </div>
@@ -135,7 +135,7 @@
     @if ($isOpen)
         <div class="fixed inset-0 z-50 flex items-center justify-center">
             <div class="fixed inset-0 bg-black bg-opacity-50" wire:click="closeModal()"></div>
-            <div class="relative bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="relative bg-white rounded-lg shadow-lg w-full max-w-6xl mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="px-4 py-3 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
                     <h5 class="font-semibold text-gray-700">Process Payment</h5>
                     <button class="text-gray-500 hover:text-gray-700" wire:click="closeModal()">
@@ -143,54 +143,24 @@
                     </button>
                 </div>
                 <div class="p-4">
-                    <form>
-                        <div class="mb-4">
-                            <label class="block text-xs font-semibold text-gray-700 mb-2">Selected Loans Summary</label>
-                            <div class="overflow-x-auto border border-gray-200 rounded">
-                                <table class="min-w-full text-xs">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Loan Name</th>
-                                            <th class="px-2 py-1 text-right font-medium text-gray-600">Balance</th>
-                                            <th class="px-2 py-1 text-right font-medium text-gray-600">Monthly Due</th>
-                                            <th class="px-2 py-1 text-right font-medium text-gray-600">Pay Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-200">
-                                        @foreach($selectedLoans as $loanId)
-                                            @php
-                                                $loan = collect($loanData)->firstWhere('id', $loanId);
-                                            @endphp
-                                            @if($loan)
-                                            <tr>
-                                                <td class="px-2 py-1">{{ $loan['name'] }}</td>
-                                                <td class="px-2 py-1 text-right">{{ number_format($loan['balance'], 2) }}</td>
-                                                <td class="px-2 py-1 text-right">{{ number_format($loan['total_monthly_due'], 2) }}</td>
-                                                <td class="px-2 py-1 text-right font-medium">
-                                                    {{ number_format(($calculatedPayments[$loanId]['pay_amount'] ?? 0), 2) }}
-                                                </td>
-                                            </tr>
-                                            @endif
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                    @if($confirmingPayment)
+                        <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800">
+                            <h4 class="font-bold mb-2">Confirm Payment</h4>
+                            <p>Are you sure you want to process the payment of <strong>{{ number_format($payment_amount, 2) }}</strong> for {{ count($selectedLoans) }} loan(s)?</p>
+                            <div class="mt-4 flex gap-2">
+                                <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" wire:click="store()">Yes, Process Payment</button>
+                                <button class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600" wire:click="cancelConfirmation()">Cancel</button>
                             </div>
                         </div>
+                    @endif
 
-                        <div class="grid grid-cols-2 gap-3">
+                    <form>
+                        <div class="grid grid-cols-3 gap-3 mb-4">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Payment Date <span class="text-red-500">*</span></label>
-                                <input type="date" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="payment_date">
+                                <input type="date" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model.lazy="payment_date">
                                 @error('payment_date') <span class="text-red-500 text-xs">{{ $message }}</span>@enderror
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Payment Amount <span class="text-red-500">*</span></label>
-                                <input type="number" step="0.01" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="payment_amount" placeholder="0.00">
-                                @error('payment_amount') <span class="text-red-500 text-xs">{{ $message }}</span>@enderror
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Payment Method</label>
                                 <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="payment_method">
@@ -199,6 +169,57 @@
                                     <option value="upi">UPI</option>
                                     <option value="other">Other</option>
                                 </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Total Payment Amount</label>
+                                <input type="text" class="w-full px-2 py-1.5 bg-gray-100 border border-gray-300 rounded text-sm font-bold" value="{{ number_format($payment_amount, 2) }}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Selected Loans Details</label>
+                            <div class="overflow-x-auto border border-gray-200 rounded">
+                                <table class="min-w-full text-xs">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-2 py-2 text-left font-medium text-gray-600">Member</th>
+                                            <th class="px-2 py-2 text-left font-medium text-gray-600">Loan Scheme</th>
+                                            <th class="px-2 py-2 text-right font-medium text-gray-600">ROI %</th>
+                                            <th class="px-2 py-2 text-right font-medium text-gray-600">Balance</th>
+                                            <th class="px-2 py-2 text-center font-medium text-gray-600">Days</th>
+                                            <th class="px-2 py-2 text-right font-medium text-gray-600">Interest</th>
+                                            <th class="px-2 py-2 text-right font-medium text-gray-600">Others</th>
+                                            <th class="px-2 py-2 text-right font-medium text-gray-600 w-32">Principal</th>
+                                            <th class="px-2 py-2 text-right font-medium text-gray-600">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        @foreach($calculatedPayments as $loanId => $calc)
+                                            <tr>
+                                                <td class="px-2 py-2">{{ $calc['member_name'] }}</td>
+                                                <td class="px-2 py-2">{{ $calc['scheme_name'] }}</td>
+                                                <td class="px-2 py-2 text-right">{{ number_format($calc['roi'], 2) }}%</td>
+                                                <td class="px-2 py-2 text-right font-medium">{{ number_format($calc['balance'], 2) }}</td>
+                                                <td class="px-2 py-2 text-center">{{ $calc['days'] }}</td>
+                                                <td class="px-2 py-2 text-right text-blue-600">{{ number_format($calc['interest'], 2) }}</td>
+                                                <td class="px-2 py-2 text-right text-gray-600">{{ number_format($calc['others'], 2) }}</td>
+                                                <td class="px-2 py-2 text-right">
+                                                    <input type="number" step="0.01" 
+                                                        class="w-full px-2 py-1 border border-blue-300 rounded text-right text-xs focus:outline-none focus:border-blue-500 bg-blue-50" 
+                                                        wire:model.lazy="principal_amounts.{{ $loanId }}"
+                                                        placeholder="0.00">
+                                                </td>
+                                                <td class="px-2 py-2 text-right font-bold text-green-700">{{ number_format($calc['total'], 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot class="bg-gray-50 font-bold">
+                                        <tr>
+                                            <td colspan="8" class="px-2 py-2 text-right">Grand Total:</td>
+                                            <td class="px-2 py-2 text-right text-lg text-green-800">{{ number_format($payment_amount, 2) }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
                         </div>
 
@@ -210,7 +231,9 @@
                 </div>
                 <div class="px-4 py-3 border-t border-gray-200 flex justify-end gap-2 sticky bottom-0 bg-white">
                     <button class="px-3 py-1.5 bg-gray-500 text-white text-sm rounded hover:bg-gray-600" wire:click="closeModal()">Close</button>
-                    <button class="px-3 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700" wire:click="store()">Process Payment</button>
+                    @if(!$confirmingPayment)
+                        <button class="px-3 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700" wire:click="store()">Submit Payment</button>
+                    @endif
                 </div>
             </div>
         </div>

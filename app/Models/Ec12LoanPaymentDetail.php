@@ -13,9 +13,12 @@ class Ec12LoanPaymentDetail extends Model
     protected $fillable = [
         'loan_payment_id',
         'loan_emi_schedule_id',
-        'loan_assign_detail_amount',
+        'feature_type',
+        'loan_emi_principal_amount',
+        'loan_emi_interest_amount',
+        'loan_emi_other_amount',
         'is_active',
-        'remarks',
+        'user_id',
     ];
 
     public function loanPayment()
