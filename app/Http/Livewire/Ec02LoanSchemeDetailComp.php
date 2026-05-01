@@ -116,9 +116,21 @@ class Ec02LoanSchemeDetailComp extends Component
     {
         $validated = $this->validate();
 
+        if ($this->loan_scheme_id && $this->loan_scheme_feature_id) {
+            $query = Ec02LoanSchemeDetail::where('loan_scheme_id', $this->loan_scheme_id)
+                ->where('loan_scheme_feature_id', $this->loan_scheme_feature_id);
+
+            if ($this->detail_id) {
+                $query->where('id', '!=', $this->detail_id);
+            }
+
+            $query->where('is_active', true)
+                ->update(['is_active' => false]);
+        }
+
         Ec02LoanSchemeDetail::updateOrCreate(['id' => $this->detail_id], array_merge($validated, [
             'is_default' => $this->is_default,
-            'is_active' => $this->is_active,
+            'is_active' => true,
         ]));
 
         session()->flash('message', $this->detail_id ? 'Detail Updated Successfully.' : 'Detail Created Successfully.');

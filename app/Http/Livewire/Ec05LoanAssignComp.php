@@ -39,6 +39,8 @@ class Ec05LoanAssignComp extends Component
     public $loan_amount = '';
     public $loan_current_balance = '';
     public $roi = '';
+    public $pre_calculated_roi = '';
+    public $pre_calculated_emi_amount = '';
     public $is_emi_enabled = false;
     public $no_of_years = '';
     public $no_of_emi = '';
@@ -47,6 +49,7 @@ class Ec05LoanAssignComp extends Component
     public $next_emi_due_date = '';
     public $remarks = '';
     public $is_active = true;
+    public $selected_scheme_details = [];
 
     protected function rules()
     {
@@ -70,11 +73,11 @@ class Ec05LoanAssignComp extends Component
             ->whereDoesntHave('loanAssigns')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('loan_amount', 'like', '%' . $this->search . '%');
+                    ->orWhere('loan_amount', 'like', '%' . $this->search . '%');
             })
             ->when($this->status, function ($query) {
                 $query->where('status', $this->status);
-            })            
+            })
             ->orderBy('id', 'asc')
             ->get()
             ->map(function ($loan) {
@@ -85,10 +88,9 @@ class Ec05LoanAssignComp extends Component
                 // $loan->loanRequestDetails = $loan->loanRequestDetails->toArray();
                 return $loan;
             })
-            ->toArray()
-            ;
-            // ->paginate(10);
-            // dd($unassignedLoans);
+            ->toArray();
+        // ->paginate(10);
+        // dd($unassignedLoans);
         $this->assignedLoans = Ec05LoanAssign::with(['member', 'loanScheme', 'loanAssignDetails', 'emiSchedules'])
             ->orderBy('id', 'asc')
             ->get()
@@ -104,7 +106,7 @@ class Ec05LoanAssignComp extends Component
                 $loan->roi = (float) $loan->loanAssignDetails
                     ->where('loan_scheme_detail_feature_id', 1) // 1 for roi
                     ->first()
-                    ->loan_scheme_detail_feature_value ?? 0;  
+                    ->loan_scheme_detail_feature_value ?? 0;
 
                 $loan->emi_amount = (float) $loan->emi_amount;
                 $loan->no_of_emi = (int) $loan->no_of_emi;
@@ -112,7 +114,7 @@ class Ec05LoanAssignComp extends Component
             })
             ->toArray();
 
-            // dd(json_encode($this->assignedLoans));
+        // dd(json_encode($this->assignedLoans));
 
         return view('livewire.ec05-loan-assign-comp', compact('unassignedLoans'));
     }
@@ -121,38 +123,69 @@ class Ec05LoanAssignComp extends Component
     {
         $this->selectedLoanRequestId = $loanRequestId;
         $this->selectedLoanRequest = Ec03LoanRequest::with(['member', 'loanScheme'])->find($loanRequestId);
-        
+
         $this->loanRequestDetails = Ec04LoanRequestDetail::where('loan_request_id', $loanRequestId)
             ->with(['loanSchemeDetail', 'loanSchemeFeature'])
             ->get()
+            ->values()
             ->toArray();
 
-        $roiValue = '';
+        $this->selected_scheme_details = [];
         foreach ($this->loanRequestDetails as $detail) {
+            $this->selected_scheme_details[$detail['id']] = true;
+        }
+
+        $roiValue = '';
+        $emiAmountValue = '';
+        $noOfYearsValue = 0;
+        $loanAmountValue = 0;
+
+        foreach ($this->loanRequestDetails as $detail) {
+            $featureId = $detail['loan_scheme_feature_id'] ?? 0;
             $featureName = strtolower($detail['loan_scheme_feature_name'] ?? '');
-            if (strpos($featureName, 'roi') !== false || strpos($featureName, 'interest') !== false) {
-                $roiValue = $detail['loan_scheme_feature_value'];
-                break;
+            $featureValue = $detail['loan_scheme_feature_value'] ?? '';
+
+            if ($featureId == 1 || strpos($featureName, 'rate of interest') !== false) {
+                $roiValue = $featureValue;
+            }
+            if ($featureId == 4 || strpos($featureName, 'emi') !== false || strpos($featureName, 'installment') !== false) {
+                $emiAmountValue = $featureValue;
+            }
+            if ($featureId == 5 || strpos($featureName, 'year') !== false || strpos($featureName, 'tenure') !== false || strpos($featureName, 'duration') !== false) {
+                $noOfYearsValue = floatval($featureValue);
+            }
+            if (strpos($featureName, 'principal') !== false || strpos($featureName, 'loan amount') !== false) {
+                $loanAmountValue = floatval($featureValue);
             }
         }
 
         $this->loan_assigned_date = now()->toDateString();
-        $this->loan_amount = $this->selectedLoanRequest->loan_amount ?? '';
-        $this->loan_current_balance = $this->selectedLoanRequest->loan_amount ?? '';
+        $this->loan_amount = $loanAmountValue > 0 ? $loanAmountValue : ($this->selectedLoanRequest->loan_amount ?? '');
+        $this->loan_current_balance = $this->loan_amount;
         $this->roi = $roiValue;
-        $this->no_of_years = $this->selectedLoanRequest->no_of_years ?? 0;
-        $this->no_of_emi = $this->no_of_years * 12;
+        $this->pre_calculated_roi = $roiValue;
+        $this->no_of_years = $noOfYearsValue > 0 ? $noOfYearsValue : ($this->selectedLoanRequest->no_of_years ?? 0);
+        $this->no_of_emi = intval($this->no_of_years) * 12;
         $this->is_emi_enabled = $this->selectedLoanRequest->emi_active ?? false;
-        
+
+        if ($emiAmountValue > 0) {
+            $this->emi_amount = $emiAmountValue;
+            $this->pre_calculated_emi_amount = $emiAmountValue;
+        }
+
         $this->calculateEmis();
-        
+
+        if ($emiAmountValue > 0) {
+            $this->emi_amount = $emiAmountValue;
+        }
+
         $this->isOpen = true;
     }
 
     private function calculateEmis()
     {
         $this->calculatedEmis = [];
-        
+
         if (!$this->is_emi_enabled || !$this->loan_amount || !$this->roi || !$this->no_of_emi) {
             return;
         }
@@ -160,23 +193,23 @@ class Ec05LoanAssignComp extends Component
         $principal = floatval($this->loan_amount);
         $roi = floatval($this->roi);
         $totalEmis = intval($this->no_of_emi);
-        
+
         if ($principal <= 0 || $roi <= 0 || $totalEmis <= 0) {
             return;
         }
 
         $monthlyRate = $roi / 12 / 100;
         $monthlyEmi = ($principal * $monthlyRate * pow(1 + $monthlyRate, $totalEmis)) / (pow(1 + $monthlyRate, $totalEmis) - 1);
-        
+
         $this->emi_amount = round($monthlyEmi, 2);
-        
+
         $balance = $principal;
-        
+
         for ($i = 1; $i <= $totalEmis; $i++) {
             $interestAmount = $balance * $monthlyRate;
             $principalAmount = $monthlyEmi - $interestAmount;
             $balance -= $principalAmount;
-            
+
             $this->calculatedEmis[] = [
                 'emi_no' => $i,
                 'emi_principal' => round($principalAmount, 2),
@@ -218,13 +251,13 @@ class Ec05LoanAssignComp extends Component
     {
         $loanAssign = Ec05LoanAssign::with(['member', 'loanScheme', 'loanRequest'])
             ->find($loanAssignId);
-        
+
         $loanAssign->loan_amount = (float) $loanAssign->loan_amount;
         $loanAssign->loan_current_balance = (float) $loanAssign->loan_current_balance;
         $loanAssign->roi = (float) $loanAssign->roi;
         $loanAssign->emi_amount = (float) $loanAssign->emi_amount;
         $loanAssign->no_of_emi = (int) $loanAssign->no_of_emi;
-        
+
         $this->selectedLoanAssign = $loanAssign->toArray();
 
         $this->selectedLoanAssignDetails = Ec06LoanAssignDetail::where('loan_assign_id', $loanAssignId)
@@ -269,6 +302,8 @@ class Ec05LoanAssignComp extends Component
         $this->loan_amount = '';
         $this->loan_current_balance = '';
         $this->roi = '';
+        $this->pre_calculated_roi = '';
+        $this->pre_calculated_emi_amount = '';
         $this->is_emi_enabled = false;
         $this->no_of_years = '';
         $this->no_of_emi = '';
@@ -277,6 +312,7 @@ class Ec05LoanAssignComp extends Component
         $this->next_emi_due_date = '';
         $this->remarks = '';
         $this->is_active = true;
+        $this->selected_scheme_details = [];
     }
 
     public function store()
@@ -307,6 +343,11 @@ class Ec05LoanAssignComp extends Component
         $requestDetails = Ec04LoanRequestDetail::where('loan_request_id', $this->selectedLoanRequest->id)->get();
 
         foreach ($requestDetails as $detail) {
+            // Only save if it was selected in the modal
+            if (!isset($this->selected_scheme_details[$detail->id]) || !$this->selected_scheme_details[$detail->id]) {
+                continue;
+            }
+
             Ec06LoanAssignDetail::create([
                 'loan_assign_id' => $loanAssign->id,
                 'loan_scheme_detail_id' => $detail->loan_scheme_detail_id,
@@ -329,10 +370,10 @@ class Ec05LoanAssignComp extends Component
 
         if ($this->is_emi_enabled && !empty($this->calculatedEmis)) {
             $firstDueDate = $this->first_emi_due_date ? \Carbon\Carbon::parse($this->first_emi_due_date) : \Carbon\Carbon::now()->addMonth();
-            
+
             foreach ($this->calculatedEmis as $emi) {
                 $dueDate = $firstDueDate->copy()->addMonths($emi['emi_no'] - 1);
-                
+
                 Ec07LoanEmiSchedule::create([
                     'loan_assign_id' => $loanAssign->id,
                     'name' => 'EMI ' . $emi['emi_no'],

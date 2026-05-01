@@ -178,11 +178,16 @@
                 </div>
                 <div class="p-4">
                     @if($selectedLoanRequest)
-                        <div class="mb-4 p-3 bg-gray-50 rounded">
-                            <p class="text-sm"><strong>Member:</strong> {{ $selectedLoanRequest->member->name ?? '-' }}</p>
-                            <p class="text-sm"><strong>Scheme:</strong> {{ $selectedLoanRequest->loanScheme->name ?? '-' }}</p>
-                            <p class="text-sm"><strong>Loan Amount:</strong> {{ number_format($selectedLoanRequest->loan_amount, 2) }}</p>
-                            <p class="text-sm"><strong>Duration:</strong> {{ $selectedLoanRequest->no_of_years ?? 0 }} years</p>
+                        <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
+                            <h4 class="text-sm font-semibold text-blue-800 mb-2">Loan Request Detail</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <p class="text-sm"><strong>Rate of Interest:</strong> {{ $pre_calculated_roi ?? '-' }}%</p>
+                                <p class="text-sm"><strong>EMI Amount:</strong> {{ $pre_calculated_emi_amount ? number_format($pre_calculated_emi_amount, 2) : '-' }}</p>
+                                <p class="text-sm"><strong>Member:</strong> {{ $selectedLoanRequest->member->name ?? '-' }}</p>
+                                <p class="text-sm"><strong>Scheme:</strong> {{ $selectedLoanRequest->loanScheme->name ?? '-' }}</p>
+                                <p class="text-sm"><strong>Loan Amount:</strong> {{ number_format($selectedLoanRequest->loan_amount, 2) }}</p>
+                                <p class="text-sm"><strong>Duration:</strong> {{ $selectedLoanRequest->no_of_years ?? 0 }} years</p>
+                            </div>
                         </div>
 
                         @if(count($loanRequestDetails) > 0)
@@ -192,17 +197,29 @@
                                     <table class="min-w-full text-xs">
                                         <thead class="bg-gray-100">
                                             <tr>
+                                                <th class="px-2 py-1 text-left font-medium text-gray-600 w-10">Select</th>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Feature</th>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Value</th>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Condition</th>
+                                                <th class="px-2 py-1 text-left font-medium text-gray-600 w-16">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-gray-200">
                                             @foreach($loanRequestDetails as $detail)
-                                                <tr>
+                                                <tr class="{{ isset($detail['loan_scheme_detail']) && !$detail['loan_scheme_detail']['is_active'] ? 'bg-red-50 opacity-60' : '' }}">
+                                                    <td class="px-2 py-1">
+                                                        <input type="checkbox" wire:model="selected_scheme_details.{{ $detail['id'] }}">
+                                                    </td>
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_feature_name'] ?? '-' }}</td>
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_feature_value'] ?? '-' }}</td>
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_feature_condition'] ?? '-' }}</td>
+                                                    <td class="px-2 py-1">
+                                                        @if(isset($detail['loan_scheme_detail']) && $detail['loan_scheme_detail']['is_active'])
+                                                            <span class="px-1 py-0.5 bg-green-100 text-green-700 text-xs rounded">Active</span>
+                                                        @else
+                                                            <span class="px-1 py-0.5 bg-red-100 text-red-700 text-xs rounded">Inactive</span>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -221,38 +238,6 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Loan Released Date</label>
                             <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_released_date">
                         </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Loan Amount</label>
-                            <input type="number" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_amount">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Current Balance</label>
-                            <input type="number" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_current_balance">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ROI (%)</label>
-                            <input type="number" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="roi">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">No. of Years</label>
-                            <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="no_of_years">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">No. of EMI</label>
-                            <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="no_of_emi">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">EMI Amount</label>
-                            <input type="number" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="emi_amount">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">First EMI Due Date</label>
-                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="first_emi_due_date">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Next EMI Due Date</label>
-                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="next_emi_due_date">
-                        </div>
                         <div class="mb-3 flex items-center mt-6">
                             <input type="checkbox" class="mr-2" wire:model="is_emi_enabled" id="is_emi_enabled">
                             <label for="is_emi_enabled" class="text-sm text-gray-700">EMI Enabled</label>
@@ -261,9 +246,13 @@
                             <input type="checkbox" class="mr-2" wire:model="is_active" id="is_active">
                             <label for="is_active" class="text-sm text-gray-700">Active</label>
                         </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
-                            <textarea class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="remarks" rows="2"></textarea>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First EMI Due Date</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="first_emi_due_date">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Next EMI Due Date</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="next_emi_due_date">
                         </div>
                     </div>
 
@@ -296,6 +285,11 @@
                             </div>
                         </div>
                     @endif
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="remarks" rows="2"></textarea>
+                    </div>
 
                     <div class="flex justify-end gap-2 mt-4">
                         <button class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600" wire:click="closeModal">Cancel</button>
