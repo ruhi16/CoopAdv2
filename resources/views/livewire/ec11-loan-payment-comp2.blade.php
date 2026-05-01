@@ -32,16 +32,17 @@
                                 <input type="checkbox" class="w-4 h-4" wire:click="selectAll()">
                             </th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">No.</th>
-                            <th class="px-2 py-2 text-left font-medium text-gray-600">Member</th>
-                            <th class="px-2 py-2 text-left font-medium text-gray-600">Loan Name</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">ID Member</th>
+                            {{-- <th class="px-2 py-2 text-left font-medium text-gray-600">Loan Name</th> --}}
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Scheme</th>
                             <th class="px-2 py-2 text-right font-medium text-gray-600">Loan Amount</th>
-                            <th class="px-2 py-2 text-right font-medium text-gray-600">ROI %</th>
-                            <th class="px-2 py-2 text-right font-medium text-gray-600">Paid</th>
                             <th class="px-2 py-2 text-right font-medium text-gray-600">Balance</th>
+                            <th class="px-2 py-2 text-right font-medium text-gray-600">ROI %</th>
+                            <th class="px-2 py-2 text-right font-medium text-gray-600">Days</th>
+                            <th class="px-2 py-2 text-right font-medium text-gray-600">Principal</th>
                             <th class="px-2 py-2 text-right font-medium text-gray-600">EMI</th>
                             <th class="px-2 py-2 text-right font-medium text-gray-600">Interest</th>
-                            <th class="px-2 py-2 text-right font-medium text-gray-600">Total Due</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Total Due</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Last Payment</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Status</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Action</th>
@@ -60,22 +61,27 @@
                                     {{ $loan['member_id'] }} {{ $loan['member_name'] }}
                                     ({{ $loan['id'] }})
                                 </td>
-                                <td class="px-2 py-2">{{ $loan['name'] }}</td>
+                                {{-- <td class="px-2 py-2">{{ $loan['name'] }}</td> --}}
                                 <td class="px-2 py-2">{{ $loan['scheme_name'] }}</td>
                                 <td class="px-2 py-2 text-right">{{ number_format($loan['loan_amount'], 2) }}</td>
-                                <td class="px-2 py-2 text-right">{{ number_format($loan['roi'], 2) }}%</td>
-                                <td class="px-2 py-2 text-right text-green-600">{{ number_format($loan['total_paid'], 2) }}</td>
                                 <td class="px-2 py-2 text-right font-medium {{ $loan['balance'] > 0 ? 'text-red-600' : 'text-green-600' }}">
                                     {{ number_format($loan['balance'], 2) }}
                                 </td>
+                                <td class="px-2 py-2 text-right">{{ number_format($loan['roi'], 2) }}%</td>
+                                <td class="px-2 py-2 text-right">
+                                    {{ \Carbon\Carbon::now()->diffInDays($loan['last_payment_date']) }}
+                                </td>
+                                <td class="px-2 py-2 text-right text-green-600">{{ number_format($loan['total_paid'], 0) }}</td>
+                                
                                 <td class="px-2 py-2 text-right">{{ number_format($loan['monthly_emi'], 2) }}</td>
                                 <td class="px-2 py-2 text-right">{{ number_format($loan['monthly_interest'], 2) }}</td>
-                                <td class="px-2 py-2 text-right font-medium text-blue-600">{{ number_format($loan['total_monthly_due'], 2) }}</td>
+                                <td class="px-2 py-2 text-right font-medium text-blue-600">{{ number_format($loan['total_monthly_due'], 0) }}</td>
                                 <td class="px-2 py-2">
                                     @if($loan['last_payment_amount'])
                                         <span class="text-xs">
                                             {{ number_format($loan['last_payment_amount'], 2) }}
                                             <br><span class="text-gray-500">{{ date('d-m-Y', strtotime($loan['last_payment_date'])) }}</span>
+                                            <br><span class="text-red-600">{{ \Carbon\Carbon::now()->diffInDays($loan['last_payment_date']) }} days ago                                            
                                         </span>
                                     @else
                                         -
@@ -103,21 +109,26 @@
                             <tr class="bg-gray-50">
                                 <td colspan="3"></td>
                                 <td colspan="10" class="px-2 py-2">
-                                    <div class="text-xs text-gray-600">
+                                    {{-- <div class="text-xs text-gray-600">
                                         <strong>Scheme Details:</strong>
                                         @foreach($loan['scheme_details'] as $detail)
                                             <span class="mr-3">{{ $detail['name'] ?? '-' }}: {{ number_format($detail['value'] ?? 0, 2) }}</span>
                                         @endforeach
-                                    </div>
+                                    </div> --}}
                                     @if($loan['payment_history'] && count($loan['payment_history']) > 0)
                                     <div class="text-xs text-gray-600 mt-1">
                                         <strong>Payment History:</strong>
                                         @foreach($loan['payment_history'] as $payment)
-                                            <span class="mr-2">
+                                            <span class="mr-2 text-blue-600">
                                                 {{ date('d-m-Y', strtotime($payment['payment_date'])) }}: 
                                                 {{ number_format($payment['payment_total_amount'], 2) }}
+                                                {{ \Carbon\Carbon::now()->diffInDays($payment['payment_date']) }} days ago
                                             </span>
                                         @endforeach
+                                    </div>
+                                    @else
+                                    <div class="text-xs text-red-600 mt-1">
+                                        <strong>No Payment History Found!</strong>
                                     </div>
                                     @endif
                                 </td>

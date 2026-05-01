@@ -3,6 +3,11 @@ FROM stloanassign st, members m, stloanpayment stp
 WHERE st.mId = m.id AND st.Id = stp.LId AND stp.colDate >= '2026-04-01 00:00:00'
 ORDER BY m.id, stp.colDate;
 
+SELECT st.id, m.id, m.Name, st.LoanAmt, st.LoanInt, st.sChrg , st.CurrBal, stp.roi, stp.prnAmt, stp.intAmt, stp.Total, stp.forMonth, stp.forYear, stp.currBal, stp.colDate
+FROM mtloanassign st, members m, mtloanpayment stp
+WHERE st.mId = m.id AND st.Id = stp.LId AND stp.colDate = '2026-04-01 00:00:00'
+ORDER BY m.id, stp.colDate;
+
 -- Narayan Barman
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
 VALUES (1, 1, 1, 75000, 50000, '2026-04-01 00:00:00');
