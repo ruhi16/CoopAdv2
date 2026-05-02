@@ -124,6 +124,7 @@ class Ec03LoanRequestComp extends Component
 
         if (!$this->loan_request_id && $this->loan_scheme_id) {
             $schemeDetails = Ec02LoanSchemeDetail::where('loan_scheme_id', $this->loan_scheme_id)
+                ->where('is_active', true)
                 ->orderBy('order_index', 'asc')
                 ->get();
 
@@ -256,6 +257,7 @@ class Ec03LoanRequestComp extends Component
     {
         if ($schemeId) {
             $this->schemeDetails = Ec02LoanSchemeDetail::where('loan_scheme_id', $schemeId)
+                ->where('is_active', true)
                 ->orderBy('order_index', 'asc')
                 ->get()
                 ->toArray();

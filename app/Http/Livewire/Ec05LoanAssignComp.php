@@ -125,6 +125,7 @@ class Ec05LoanAssignComp extends Component
         $this->selectedLoanRequest = Ec03LoanRequest::with(['member', 'loanScheme'])->find($loanRequestId);
 
         $this->loanRequestDetails = Ec04LoanRequestDetail::where('loan_request_id', $loanRequestId)
+            ->where('is_active', true)
             ->with(['loanSchemeDetail', 'loanSchemeFeature'])
             ->get()
             ->values()
@@ -166,7 +167,7 @@ class Ec05LoanAssignComp extends Component
         $this->pre_calculated_roi = $roiValue;
         $this->no_of_years = $noOfYearsValue > 0 ? $noOfYearsValue : ($this->selectedLoanRequest->no_of_years ?? 0);
         $this->no_of_emi = intval($this->no_of_years) * 12;
-        $this->is_emi_enabled = $this->selectedLoanRequest->emi_active ?? false;
+        $this->is_emi_enabled = false;
 
         if ($emiAmountValue > 0) {
             $this->emi_amount = $emiAmountValue;

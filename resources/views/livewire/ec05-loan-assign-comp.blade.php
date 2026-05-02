@@ -206,7 +206,7 @@
                                         </thead>
                                         <tbody class="divide-y divide-gray-200">
                                             @foreach($loanRequestDetails as $detail)
-                                                <tr class="{{ isset($detail['loan_scheme_detail']) && !$detail['loan_scheme_detail']['is_active'] ? 'bg-red-50 opacity-60' : '' }}">
+                                                <tr>
                                                     <td class="px-2 py-1">
                                                         <input type="checkbox" wire:model="selected_scheme_details.{{ $detail['id'] }}">
                                                     </td>
@@ -214,11 +214,7 @@
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_feature_value'] ?? '-' }}</td>
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_feature_condition'] ?? '-' }}</td>
                                                     <td class="px-2 py-1">
-                                                        @if(isset($detail['loan_scheme_detail']) && $detail['loan_scheme_detail']['is_active'])
-                                                            <span class="px-1 py-0.5 bg-green-100 text-green-700 text-xs rounded">Active</span>
-                                                        @else
-                                                            <span class="px-1 py-0.5 bg-red-100 text-red-700 text-xs rounded">Inactive</span>
-                                                        @endif
+                                                        <span class="px-1 py-0.5 bg-green-100 text-green-700 text-xs rounded">Active</span>
                                                     </td>
                                                 </tr>
                                             @endforeach
