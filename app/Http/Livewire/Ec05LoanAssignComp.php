@@ -332,6 +332,8 @@ class Ec05LoanAssignComp extends Component
             'loan_amount' => $this->loan_amount,
             'loan_current_balance' => $this->loan_current_balance,
             'roi' => $this->roi,
+            'loan_duration_in_years' => $this->no_of_years,
+            'loan_duration_in_months' => $this->no_of_years * 12,
             'is_emi_enabled' => $this->is_emi_enabled,
             'no_of_emi' => $this->no_of_emi,
             'emi_amount' => $this->emi_amount,
@@ -339,6 +341,10 @@ class Ec05LoanAssignComp extends Component
             'next_emi_due_date' => $this->next_emi_due_date,
             'is_active' => $this->is_active,
             'status' => 'Assigned',
+        ]);
+
+        Ec03LoanRequest::where('id', $this->selectedLoanRequest->id)->update([
+            'is_loan_assigned' => true,
         ]);
 
         $requestDetails = Ec04LoanRequestDetail::where('loan_request_id', $this->selectedLoanRequest->id)->get();

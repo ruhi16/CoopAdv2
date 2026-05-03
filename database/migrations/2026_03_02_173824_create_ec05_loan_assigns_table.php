@@ -31,6 +31,9 @@ class CreateEc05LoanAssignsTable extends Migration
             $table->decimal('loan_current_balance', 15, 2)->nullable();
             $table->decimal('roi', 10, 2)->nullable();
 
+            $table->integer('loan_duration_in_years')->default(0);
+            $table->integer('loan_duration_in_months')->default(0);
+
             $table->boolean('is_emi_enabled')->default(false);
             $table->integer('no_of_emi')->default(0);
             $table->decimal('emi_amount', 15, 2)->default(0.00);

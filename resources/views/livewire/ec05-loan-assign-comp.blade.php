@@ -106,10 +106,10 @@
                             <tr>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">Sl/LID</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">Id Member</th>
-                                <th class="px-3 py-2 text-left font-medium text-gray-600">LID Scheme</th>
+                                <th class="px-3 py-2 text-left font-medium text-gray-600">Scheme</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">Loan Amount</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">ROI</th>
-                                <th class="px-3 py-2 text-left font-medium text-gray-600">Tenure</th>
+                                <th class="px-3 py-2 text-left font-medium text-gray-600">Duration</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">EMI Amt</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">Total EMI</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">Current Bal</th>
@@ -118,7 +118,7 @@
                                 <th class="px-3 py-2 text-left font-medium text-gray-600">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="divide-y divide-gray-200 text-xs">
                             @foreach($assignedLoans as $assign)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-3 py-2">{{ $loop->iteration }} / {{ $assign['id'] }}</td>
@@ -126,8 +126,7 @@
                                         <span class="text-sm text-gray-500">{{ $assign['member']['id'] ?? '-' }}</span>
                                         {{ $assign['member']['name'] ?? '-' }}
                                     </td>
-                                    <td class="px-3 py-2">
-                                        {{ $assign['loan_id'] ?? '-' }} :
+                                    <td class="px-3 py-2">                                        
                                         {{ $assign['loan_scheme']['name'] ?? '-' }}</td>
                                     <td class="px-3 py-2">{{ number_format($assign['loan_amount'], 2) }}</td>
                                     <td class="px-3 py-2">
@@ -135,9 +134,10 @@
                                         {{ $assign['roi'] ?? 0 }}%
                                     </td>
                                     <td class="px-3 py-2">
-                                        
-                                            {{ $assign['is_emi_enabled'] ? str($assign['no_of_emi'] ?? 0 ).'mo': '-' }}
-                                        
+                                        {{ $assign['loan_duration_in_years'] ?? 0 }} yrs
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ $assign['is_emi_enabled'] ? str($assign['no_of_emi'] ?? 0 ).'mo': '-' }}                                        
                                     </td>
                                     <td class="px-3 py-2">
                                         {{ $assign['is_emi_enabled'] ? (number_format($assign['emi_amount'], 2)) : '-' }}

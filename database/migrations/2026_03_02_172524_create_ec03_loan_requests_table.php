@@ -30,6 +30,7 @@ class CreateEc03LoanRequestsTable extends Migration
             $table->integer('created_by')->default(0);
             $table->integer('approved_by')->default(0);
             $table->integer('school_id')->default(0);
+            $table->boolean('is_loan_assigned')->default(false);
             $table->string('remarks')->nullable();
             $table->string('status')->nullable(); 
             $table->timestamps();

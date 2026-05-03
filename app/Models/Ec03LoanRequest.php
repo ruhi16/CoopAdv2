@@ -23,6 +23,7 @@ class Ec03LoanRequest extends Model
         'is_active',
         'created_by',
         'approved_by',
+        'is_loan_assigned',
         'school_id',
         'remarks',
         'status',

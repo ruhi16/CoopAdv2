@@ -37,49 +37,69 @@
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-indigo-200 divide-y divide-gray-400">
                         <tr>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">No.</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Name</th>
+                            {{-- <th class="px-3 py-2 text-left font-medium text-gray-600">Name</th> --}}
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Member</th>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Scheme</th>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Amount</th>
+                            <th class="px-3 py-2 text-left font-medium text-gray-600">Details</th>
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Status</th>
-                            <th class="px-3 py-2 text-left font-medium text-gray-600">Active</th>
+                            {{-- <th class="px-3 py-2 text-left font-medium text-gray-600">Active</th> --}}
                             <th class="px-3 py-2 text-left font-medium text-gray-600">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody class="divide-y  divide-gray-400">
                         @forelse ($loanRequests as $request)
-                            <tr class="hover:bg-gray-50">
+                            <tr class="hover:bg-gray-50 cursor-pointer">
                                 <td class="px-3 py-2">{{ $loop->iteration + ($loanRequests->currentPage() - 1) * $loanRequests->perPage() }}</td>
-                                <td class="px-3 py-2">{{ $request->name }}</td>
+                                {{-- <td class="px-3 py-2">{{ $request->name }}xx</td> --}}
                                 <td class="px-3 py-2">{{ $request->member->name ?? '-' }}</td>
                                 <td class="px-3 py-2">{{ $request->loanScheme->name ?? '-' }}</td>
                                 <td class="px-3 py-2">{{ number_format($request->loan_amount, 2) }}</td>
                                 <td class="px-3 py-2">
+                                    @if($request->is_loan_assigned)
+                                        @forelse ($request->loanRequestDetails as $detail)
+                                            {{ $detail->loan_scheme_feature_name }}: {{ $detail->loan_scheme_feature_value }} %<br/>
+                                        
+                                        @empty
+                                            {{ '-' }}
+                                        @endforelse
+                                    @endif
+                                </td>
+                                {{-- <td class="px-3 py-2">
                                     @if($request->status == 'Approved')
                                         <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
                                     @elseif($request->status == 'Rejected')
                                         <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
                                     @else
-                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
+                                        @if($request->is_loan_assigned == false)
+                                            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
+                                        @else
+                                            <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Assigned</span>
+                                    
+                                        @endif
+                                    @endif
+                                </td> --}}
+                                <td class="px-3 py-2">
+                                    @if($request->is_loan_assigned)
+                                        <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded">Assigned</span>
+                                    @else
+                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Unassigned</span>
                                     @endif
                                 </td>
                                 <td class="px-3 py-2">
-                                    @if($request->is_active)
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Active</span>
+                                    @if($request->is_loan_assigned)
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">No Actions Required</span>
                                     @else
-                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Inactive</span>
-                                    @endif
-                                </td>
-                                <td class="px-3 py-2">
-                                    <button class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 mr-1" wire:click="edit({{ $request->id }})">Edit</button>
-                                    @if ($confirmingDelete === $request->id)
-                                        <button class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 mr-1" wire:click="delete({{ $request->id }})">Confirm</button>
-                                        <button class="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600" wire:click="cancelDelete()">Cancel</button>
-                                    @else
-                                        <button class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700" wire:click="confirmDelete({{ $request->id }})">Delete</button>
+                                        <button class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-200 mr-1" wire:click="edit({{ $request->id }})" @if($request->is_loan_assigned) disabled @endif>Edit</button>
+                                        @if ($confirmingDelete === $request->id)
+                                            <button class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 mr-1" wire:click="delete({{ $request->id }})" @if($request->is_loan_assigned) disabled @endif>Confirm</button>
+                                            <button class="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600" wire:click="cancelDelete()" @if($request->is_loan_assigned) disabled @endif>Cancel</button>
+                                        @else
+                                            <button class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700" wire:click="confirmDelete({{ $request->id }})" @if($request->is_loan_assigned) disabled @endif>Delete</button>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

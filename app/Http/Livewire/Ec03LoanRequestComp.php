@@ -53,7 +53,7 @@ class Ec03LoanRequestComp extends Component
         $members = MemberDb::withoutGlobalScopes()->orderBy('name')->get();
         $loanSchemes = Ec01LoanScheme::orderBy('name')->get();
 
-        $loanRequests = Ec03LoanRequest::with(['member', 'loanScheme'])
+        $loanRequests = Ec03LoanRequest::with(['member', 'loanScheme', 'loanRequestDetails'])
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('description', 'like', '%' . $this->search . '%')

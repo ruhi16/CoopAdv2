@@ -23,6 +23,8 @@ class Ec05LoanAssign extends Model
         'loan_amount',
         'loan_current_balance',
         'roi',
+        'loan_duration_in_years',
+        'loan_duration_in_months',
         'is_emi_enabled',
         'no_of_emi',
         'emi_amount',

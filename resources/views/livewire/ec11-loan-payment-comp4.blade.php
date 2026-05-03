@@ -12,7 +12,7 @@
 
     <div class="bg-white rounded-lg shadow">
         <div class="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-gray-700">Loan Payment Collection</h3>
+            <h3 class="text-lg font-semibold text-gray-700">Loan Payment Collection Comp 4</h3>
             @if(count($selectedLoans) > 0)
                 <button class="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700" wire:click="openPaymentModal()">
                     Pay Selected ({{ count($selectedLoans) }})
@@ -76,7 +76,7 @@
                                 <td class="px-2 py-2 text-right">{{ number_format($loan['monthly_emi'], 2) }}</td>
                                 <td class="px-2 py-2 text-right">{{ number_format($loan['monthly_interest'], 2) }}</td>
                                 <td class="px-2 py-2 text-right font-medium text-blue-600">{{ number_format($loan['total_monthly_due'], 0) }}</td>
-                                <td class="px-2 py-2">
+                                <td class="px-2 py-2">xx
                                     @if($loan['last_payment_amount'])
                                         {{-- <span class="text-xs">
                                             {{ number_format($loan['last_payment_amount'], 2) }}
@@ -105,6 +105,66 @@
                                     </button>
                                 </td>
                             </tr>
+                            @if($loan['scheme_details'] && count($loan['scheme_details']) > 0)
+                            <tr class="bg-gray-50">
+                                <td colspan="3"></td>
+                                <td colspan="12" class="px-2 py-2">
+                                    {{-- <div class="text-xs text-gray-600">
+                                        <strong>Scheme Details:</strong>
+                                        @foreach($loan['scheme_details'] as $detail)
+                                            <span class="mr-3">{{ $detail['name'] ?? '-' }}: {{ number_format($detail['value'] ?? 0, 2) }}</span>
+                                        @endforeach
+                                    </div> --}}
+                                    @if($loan['payment_history'] && count($loan['payment_history']) > 0)
+                                    <div class="text-xs text-gray-600 mt-1">
+                                        {{-- <strong>Payment History:</strong> --}}
+                                        
+                                        <table class="w-auto min-w-full border border-gray-300 rounded-md">
+                                            <thead class="bg-gray-50">
+                                                <tr class="text-left ">
+                                                    <th class="px-2 py-2 border border-gray-300">Sl</th>
+                                                    <th class="px-2 py-2 border border-gray-300">Pay Dt</th>
+                                                    <th class="px-2 py-2 border border-gray-300">Payment Amount</th>
+                                                    <th class="px-2 py-2 border border-gray-300">Payment Details</th>
+                                                    {{-- <th class="px-2 py-2 border border-gray-300">Remarks</th> --}}
+                                                </tr>
+                                            </thead>
+                                            @foreach($loan['payment_history'] as $payment)
+                                            <tbody>
+                                                <tr class="bg-white">
+                                                    <td class="px-2 py-2 border border-gray-300">{{ $loop->index + 1 }}</td>
+                                                    <td class="px-2 py-2 border border-gray-300">{{ date('d-m-Y', strtotime($payment['payment_date'])) }}</td>
+                                                    <td class="px-2 py-2 border border-gray-300">{{ number_format($payment['payment_total_amount'], 2) }}</td>
+                                                    <td class="px-2 py-2 border border-gray-300">
+                                                        {{-- {{ json_encode($payment['payment_details']) }} --}}
+                                                        @foreach($payment['payment_details'] as $detail)
+                                                            {{-- <span class="mr-3">{{ $detail['id'] ?? '-' }}: {{ number_format($detail['value'] ?? 0, 2) }}</span> --}}
+                                                            {{-- <span class="mr-3">{{ json_encode($detail) }}</span> --}}
+                                                            <span class="mr-3">{{ $detail['id'] ?? '-' }}</span>
+                                                        @endforeach
+                                                        {{-- {{ $payment['remarks'] ?? '-' }} --}}
+                                                        {{-- {{ $payment['loan_payment_details'] ?? '-' }} --}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            @endforeach
+                                        </table>
+                                            {{-- <span class="mr-2 text-blue-600">
+                                                {{ date('d-m-Y', strtotime($payment['payment_date'])) }}: 
+                                                {{ number_format($payment['payment_total_amount'], 2) }}
+                                                {{ \Carbon\Carbon::now()->diffInDays($payment['payment_date']) }} days ago
+                                            </span> --}}
+                                        
+                                    </div>
+                                    @else
+                                    <div class="text-xs text-red-600 mt-1">
+                                        <strong>No Payment History Found!</strong>
+                                    </div>
+                                    @endif
+                                </td>
+                                <td colspan="1"></td>
+                            </tr>
+                            @endif
                             
                         @empty
                             <tr>

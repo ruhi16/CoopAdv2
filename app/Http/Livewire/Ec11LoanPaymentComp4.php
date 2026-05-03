@@ -9,7 +9,7 @@ use App\Models\Ec11LoanPayment;
 use App\Models\Ec12LoanPaymentDetail;
 use Illuminate\Support\Facades\Auth;
 
-class Ec11LoanPaymentComp3 extends Component
+class Ec11LoanPaymentComp4 extends Component
 {
     public $search = '';
     public $selectedLoans = [];
@@ -35,7 +35,6 @@ class Ec11LoanPaymentComp3 extends Component
     public function render()
     {
         $this->loanData = [];
-        $loansByScheme = [];
 
         $loans = Ec05LoanAssign::with([
             'member',
@@ -60,20 +59,7 @@ class Ec11LoanPaymentComp3 extends Component
             ->orderBy('id', 'desc')
             ->get();
 
-        $colorThemes = [
-            ['header' => 'bg-blue-600', 'border' => 'border-blue-300', 'bg' => 'bg-blue-50', 'text' => 'text-blue-800', 'badge' => 'bg-blue-100 text-blue-800', 'label' => 'Blue'],
-            ['header' => 'bg-emerald-600', 'border' => 'border-emerald-300', 'bg' => 'bg-emerald-50', 'text' => 'text-emerald-800', 'badge' => 'bg-emerald-100 text-emerald-800', 'label' => 'Emerald'],
-            ['header' => 'bg-violet-600', 'border' => 'border-violet-300', 'bg' => 'bg-violet-50', 'text' => 'text-violet-800', 'badge' => 'bg-violet-100 text-violet-800', 'label' => 'Violet'],
-            ['header' => 'bg-amber-600', 'border' => 'border-amber-300', 'bg' => 'bg-amber-50', 'text' => 'text-amber-800', 'badge' => 'bg-amber-100 text-amber-800', 'label' => 'Amber'],
-            ['header' => 'bg-rose-600', 'border' => 'border-rose-300', 'bg' => 'bg-rose-50', 'text' => 'text-rose-800', 'badge' => 'bg-rose-100 text-rose-800', 'label' => 'Rose'],
-            ['header' => 'bg-teal-600', 'border' => 'border-teal-300', 'bg' => 'bg-teal-50', 'text' => 'text-teal-800', 'badge' => 'bg-teal-100 text-teal-800', 'label' => 'Teal'],
-            ['header' => 'bg-indigo-600', 'border' => 'border-indigo-300', 'bg' => 'bg-indigo-50', 'text' => 'text-indigo-800', 'badge' => 'bg-indigo-100 text-indigo-800', 'label' => 'Indigo'],
-            ['header' => 'bg-orange-600', 'border' => 'border-orange-300', 'bg' => 'bg-orange-50', 'text' => 'text-orange-800', 'badge' => 'bg-orange-100 text-orange-800', 'label' => 'Orange'],
-        ];
-        $themeIndex = 0;
-
         foreach ($loans as $loan) {
-            $schemeName = $loan->loanScheme->name ?? 'Unknown';
             $totalPaid = Ec11LoanPayment::where('loan_assign_id', $loan->id)
                 ->where('is_active', true)
                 ->sum('payment_total_amount');
@@ -87,7 +73,7 @@ class Ec11LoanPaymentComp3 extends Component
 
             $roi = 0;
             $principal = 0;
-            $otherDues = 0;
+            $other_dues = 0;
             $schemeDetails = [];
 
             foreach ($dueDetails as $detail) {
@@ -97,7 +83,7 @@ class Ec11LoanPaymentComp3 extends Component
                 } elseif (strpos($name, 'principal') !== false) {
                     $principal = floatval($detail->loan_scheme_detail_feature_value ?? 0);
                 } else {
-                    $otherDues += floatval($detail->loan_scheme_detail_feature_value ?? 0);
+                    $other_dues += floatval($detail->loan_scheme_detail_feature_value ?? 0);
                 }
 
                 $schemeDetails[] = [
@@ -117,23 +103,17 @@ class Ec11LoanPaymentComp3 extends Component
             }
 
             $monthlyEmi = floatval($loan->emi_amount ?? 0);
-            $totalMonthlyDue = $interest + $monthlyEmi + $otherDues;
+            $totalMonthlyDue = $interest + $monthlyEmi + $other_dues;
 
             $lastPayment = Ec11LoanPayment::where('loan_assign_id', $loan->id)
                 ->where('is_active', true)
                 ->orderBy('payment_date', 'desc')
                 ->first();
 
-            $daysSinceLastPayment = 0;
-            $lastPaymentDate = $lastPayment ? $lastPayment->payment_date : $loan->loan_released_date;
-            if ($lastPaymentDate) {
-                $daysSinceLastPayment = \Carbon\Carbon::parse($lastPaymentDate)->diffInDays(\Carbon\Carbon::now());
-            }
-
-            $paymentHistory = Ec11LoanPayment::where('loan_assign_id', $loan->id)
+            $paymentHistory = Ec11LoanPayment::with('paymentDetails')
+                ->where('loan_assign_id', $loan->id)
                 ->where('is_active', true)
                 ->orderBy('payment_date', 'desc')
-                ->with('paymentDetails')
                 ->take(5)
                 ->get()
                 ->map(function ($payment) {
@@ -141,23 +121,18 @@ class Ec11LoanPaymentComp3 extends Component
                         'payment_date' => $payment->payment_date,
                         'payment_total_amount' => $payment->payment_total_amount,
                         'payment_method' => $payment->payment_method,
-                        'details' => $payment->paymentDetails->map(function ($detail) {
-                            return [
-                                'amount' => $detail->loan_assign_detail_amount,
-                                'remarks' => $detail->remarks,
-                            ];
-                        })->toArray(),
+                        'remarks' => $payment->remarks,
+                        'payment_details' => $payment->paymentDetails,
                     ];
                 })
                 ->toArray();
 
-            $loanItem = [
+            $this->loanData[] = [
                 'id' => $loan->id,
                 'name' => $loan->name,
                 'member_id' => $loan->member->id ?? '-',
                 'member_name' => $loan->member->name ?? '-',
-                'scheme_id' => $loan->loan_scheme_id,
-                'scheme_name' => $schemeName,
+                'scheme_name' => $loan->loanScheme->name ?? '-',
                 'loan_amount' => $loan->loan_amount,
                 'roi' => $roi,
                 'total_paid' => $totalPaid,
@@ -167,29 +142,13 @@ class Ec11LoanPaymentComp3 extends Component
                 'total_monthly_due' => $totalMonthlyDue,
                 'status' => $loan->status,
                 'scheme_details' => $schemeDetails,
-                'other_dues' => $otherDues,
                 'last_payment_amount' => $lastPayment ? $lastPayment->payment_total_amount : null,
-                'last_payment_date' => $lastPaymentDate,
-                'days_since_payment' => $daysSinceLastPayment,
+                'last_payment_date' => $lastPayment ? $lastPayment->payment_date : $loan->loan_released_date,
                 'payment_history' => $paymentHistory,
-                'loan_assigned_date' => $loan->loan_assigned_date,
-                'loan_released_date' => $loan->loan_released_date,
             ];
-
-            $this->loanData[] = $loanItem;
-
-            if (!isset($loansByScheme[$schemeName])) {
-                $theme = $colorThemes[$themeIndex % count($colorThemes)];
-                $loansByScheme[$schemeName] = [
-                    'theme' => $theme,
-                    'loans' => [],
-                ];
-                $themeIndex++;
-            }
-            $loansByScheme[$schemeName]['loans'][] = $loanItem;
         }
 
-        return view('livewire.ec11-loan-payment-comp3', compact('loansByScheme'));
+        return view('livewire.ec11-loan-payment-comp4');
     }
 
     public function toggleLoanSelection($loanId)
