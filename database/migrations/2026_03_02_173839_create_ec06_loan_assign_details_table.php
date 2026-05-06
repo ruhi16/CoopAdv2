@@ -20,8 +20,9 @@ class CreateEc06LoanAssignDetailsTable extends Migration
             $table->integer('loan_scheme_detail_feature_id')->nullable();
             $table->string('loan_scheme_detail_feature_name')->nullable();
             $table->double('loan_scheme_detail_feature_value', 15, 2)->nullable();
-            $table->string('loan_scheme_detail_feature_type')->nullable();
-            $table->string('loan_scheme_detail_feature_condition')->nullable();           
+            $table->string('loan_scheme_detail_feature_type')->nullable();          // percent, fixed, conditional
+            $table->string('loan_scheme_detail_feature_mandate')->nullable();       // mandatory, optional, other        
+            $table->string('loan_scheme_detail_feature_condition')->nullable();     // if type is conditional, then this field is required         
 
             
             $table->string('name')->nullable();

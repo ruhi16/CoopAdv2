@@ -17,16 +17,20 @@ class CreateEc04LoanRequestDetailsTable extends Migration
             $table->id();
             $table->integer('loan_request_id')->nullable();
             $table->integer('loan_scheme_detail_id')->nullable();
+
             $table->integer('loan_scheme_feature_id')->nullable();
-            $table->string('loan_scheme_feature_name')->nullable();
-            
+            $table->string('loan_scheme_feature_name')->nullable();            
             $table->double('loan_scheme_feature_value', 15, 2)->nullable();
+            $table->string('loan_scheme_feature_type')->nullable();
+            $table->string('loan_scheme_feature_mandate')->nullable();            
             $table->string('loan_scheme_feature_condition')->nullable();
 
             $table->string('name')->nullable();
             $table->string('description')->nullable();
             $table->integer('order_index')->default(0);
 
+
+            $table->boolean('is_optional')->default(false);
             $table->boolean('is_default')->default(false);
             $table->boolean('is_active')->default(true);
             $table->integer('created_by')->default(0);
