@@ -17,10 +17,12 @@ class Ec02LoanSchemeDetail extends Model
         'loan_scheme_feature_type',
         'loan_scheme_feature_value_type',
         'loan_scheme_feature_value',
+        'loan_scheme_feature_mandate',
         'loan_scheme_feature_condition',
         'name',
         'description',
         'order_index',
+        'is_optional',
         'is_default',
         'is_active',
         'created_by',
@@ -38,5 +40,15 @@ class Ec02LoanSchemeDetail extends Model
     public function loanSchemeFeature()
     {
         return $this->belongsTo(Ec02LoanSchemeFeature::class, 'loan_scheme_feature_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

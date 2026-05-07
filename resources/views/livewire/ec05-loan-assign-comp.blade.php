@@ -13,7 +13,7 @@
             <div class="flex justify-between mb-4 gap-2">
                 <div class="flex gap-2">
                     <input type="text" class="px-3 py-2 border border-gray-300 rounded text-sm w-48 focus:outline-none focus:border-blue-500" placeholder="Search..." wire:model="search">
-                    <select class="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="status">
+                    <select class="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="filter_status">
                         <option value="">All Status</option>
                         <option value="Pending">Pending</option>
                         <option value="Approved">Approved</option>
@@ -199,9 +199,10 @@
                                             <tr>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600 w-10">Select</th>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Feature</th>
+                                                <th class="px-2 py-1 text-left font-medium text-gray-600">Type</th>
+                                                <th class="px-2 py-1 text-left font-medium text-gray-600">Mandate</th>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Value</th>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Condition</th>
-                                                <th class="px-2 py-1 text-left font-medium text-gray-600 w-16">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-gray-200">
@@ -211,11 +212,10 @@
                                                         <input type="checkbox" wire:model="selected_scheme_details.{{ $detail['id'] }}">
                                                     </td>
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_feature_name'] ?? '-' }}</td>
+                                                    <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_feature_type'] ?? '-') }}</td>
+                                                    <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_feature_mandate'] ?? '-') }}</td>
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_feature_value'] ?? '-' }}</td>
-                                                    <td class="px-2 py-1">{{ $detail['loan_scheme_feature_condition'] ?? '-' }}</td>
-                                                    <td class="px-2 py-1">
-                                                        <span class="px-1 py-0.5 bg-green-100 text-green-700 text-xs rounded">Active</span>
-                                                    </td>
+                                                    <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_feature_condition'] ?? '-') }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -225,7 +225,7 @@
                         @endif
                     @endif
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-3 gap-4">
                         <div class="mb-3">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Loan Assigned Date</label>
                             <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_assigned_date">
@@ -234,6 +234,55 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Loan Released Date</label>
                             <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_released_date">
                         </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Loan Closed Date</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_closed_date">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Created By</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="created_by">
+                                <option value="">Select User</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Approved By</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="approved_by">
+                                <option value="">Select User</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="status">
+                                <option value="">Select Status</option>
+                                <option value="Assigned">Assigned</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Order Index</label>
+                            <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="order_index" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First EMI Due Date</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="first_emi_due_date">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-4">
                         <div class="mb-3 flex items-center mt-6">
                             <input type="checkbox" class="mr-2" wire:model="is_emi_enabled" id="is_emi_enabled">
                             <label for="is_emi_enabled" class="text-sm text-gray-700">EMI Enabled</label>
@@ -242,13 +291,9 @@
                             <input type="checkbox" class="mr-2" wire:model="is_active" id="is_active">
                             <label for="is_active" class="text-sm text-gray-700">Active</label>
                         </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">First EMI Due Date</label>
-                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="first_emi_due_date">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Next EMI Due Date</label>
-                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="next_emi_due_date">
+                        <div class="mb-3 flex items-center mt-6">
+                            <input type="checkbox" class="mr-2" wire:model="is_default" id="is_default">
+                            <label for="is_default" class="text-sm text-gray-700">Default</label>
                         </div>
                     </div>
 
@@ -345,6 +390,8 @@
                                         <thead class="bg-gray-100">
                                             <tr>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Feature Name</th>
+                                                <th class="px-2 py-1 text-left font-medium text-gray-600">Type</th>
+                                                <th class="px-2 py-1 text-left font-medium text-gray-600">Mandate</th>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Value</th>
                                                 <th class="px-2 py-1 text-left font-medium text-gray-600">Condition</th>
                                             </tr>
@@ -353,8 +400,10 @@
                                             @foreach($selectedLoanAssignDetails as $detail)
                                                 <tr>
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_detail_feature_name'] ?? '-' }}</td>
+                                                    <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_detail_feature_type'] ?? '-') }}</td>
+                                                    <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_detail_feature_mandate'] ?? '-') }}</td>
                                                     <td class="px-2 py-1">{{ $detail['loan_scheme_detail_feature_value'] ?? '-' }}</td>
-                                                    <td class="px-2 py-1">{{ $detail['loan_scheme_detail_feature_condition'] ?? '-' }}</td>
+                                                    <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_detail_feature_condition'] ?? '-') }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

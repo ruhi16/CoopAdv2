@@ -184,12 +184,18 @@
                             <label class="block text-xs font-semibold text-gray-700 mb-2">Loan Scheme Details</label>
                             <div class="overflow-x-auto border border-gray-200 rounded">
                                 <table class="min-w-full text-xs">
-                                    <thead class="bg-gray-50">
+                                    <thead class="bg-gray-50 sticky top-0">
                                         <tr>
                                             <th class="px-2 py-1 text-left font-medium text-gray-600">Name</th>
                                             <th class="px-2 py-1 text-left font-medium text-gray-600">Feature</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Type</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Value Type</th>
                                             <th class="px-2 py-1 text-left font-medium text-gray-600">Value</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Mandate</th>
                                             <th class="px-2 py-1 text-left font-medium text-gray-600">Condition</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Order</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Optional</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Default</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-200">
@@ -197,8 +203,26 @@
                                             <tr>
                                                 <td class="px-2 py-1">{{ $detail['name'] ?? '-' }}</td>
                                                 <td class="px-2 py-1">{{ $detail['loan_scheme_feature_name'] ?? '-' }}</td>
+                                                <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_feature_type'] ?? '-') }}</td>
+                                                <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_feature_value_type'] ?? '-') }}</td>
                                                 <td class="px-2 py-1">{{ $detail['loan_scheme_feature_value'] ?? '-' }}</td>
-                                                <td class="px-2 py-1">{{ $detail['loan_scheme_feature_condition'] ?? '-' }}</td>
+                                                <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_feature_mandate'] ?? '-') }}</td>
+                                                <td class="px-2 py-1">{{ ucfirst($detail['loan_scheme_feature_condition'] ?? '-') }}</td>
+                                                <td class="px-2 py-1">{{ $detail['order_index'] ?? 0 }}</td>
+                                                <td class="px-2 py-1">
+                                                    @if($detail['is_optional'])
+                                                        <span class="px-1 py-0.5 bg-green-100 text-green-700 text-xs rounded">Yes</span>
+                                                    @else
+                                                        <span class="px-1 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">No</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-2 py-1">
+                                                    @if($detail['is_default'])
+                                                        <span class="px-1 py-0.5 bg-green-100 text-green-700 text-xs rounded">Yes</span>
+                                                    @else
+                                                        <span class="px-1 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">No</span>
+                                                    @endif
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>

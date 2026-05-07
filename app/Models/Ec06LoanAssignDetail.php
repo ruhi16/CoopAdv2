@@ -17,6 +17,7 @@ class Ec06LoanAssignDetail extends Model
         'loan_scheme_detail_feature_name',
         'loan_scheme_detail_feature_value',
         'loan_scheme_detail_feature_type',
+        'loan_scheme_detail_feature_mandate',
         'loan_scheme_detail_feature_condition',
         'name',
         'description',

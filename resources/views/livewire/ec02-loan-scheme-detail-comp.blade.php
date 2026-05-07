@@ -33,9 +33,15 @@
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Type</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Value Type</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Value</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Mandate</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Condition</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Order</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Created By</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Approved By</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Optional</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Default</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Active</th>
+                            <th class="px-2 py-2 text-left font-medium text-gray-600">Status</th>
                             <th class="px-2 py-2 text-left font-medium text-gray-600">Action</th>
                         </tr>
                     </thead>
@@ -45,16 +51,42 @@
                                 <td class="px-2 py-2">{{ $detail->id }}</td>
                                 <td class="px-2 py-2">{{ $detail->loanScheme->name ?? '-' }}</td>
                                 <td class="px-2 py-2">{{ $detail->loan_scheme_feature_name }}</td>
-                                <td class="px-2 py-2">{{ $detail->loan_scheme_feature_type }}</td>
-                                <td class="px-2 py-2">{{ $detail->loan_scheme_feature_value_type }}</td>
+                                <td class="px-2 py-2">{{ ucfirst($detail->loan_scheme_feature_type ?? '-') }}</td>
+                                <td class="px-2 py-2">{{ ucfirst($detail->loan_scheme_feature_value_type ?? '-') }}</td>
                                 <td class="px-2 py-2">{{ $detail->loan_scheme_feature_value }}</td>
-                                <td class="px-2 py-2">{{ $detail->loan_scheme_feature_condition }}</td>
+                                <td class="px-2 py-2">{{ ucfirst($detail->loan_scheme_feature_mandate ?? '-') }}</td>
+                                <td class="px-2 py-2">{{ ucfirst($detail->loan_scheme_feature_condition ?? '-') }}</td>
                                 <td class="px-2 py-2">{{ $detail->order_index }}</td>
+                                <td class="px-2 py-2">{{ $detail->createdBy->name ?? '-' }}</td>
+                                <td class="px-2 py-2">{{ $detail->approvedBy->name ?? '-' }}</td>
+                                <td class="px-2 py-2">
+                                    @if($detail->is_optional)
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Yes</span>
+                                    @else
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">No</span>
+                                    @endif
+                                </td>
+                                <td class="px-2 py-2">
+                                    @if($detail->is_default)
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Yes</span>
+                                    @else
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">No</span>
+                                    @endif
+                                </td>
                                 <td class="px-2 py-2">
                                     @if($detail->is_active)
                                         <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Yes</span>
                                     @else
                                         <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">No</span>
+                                    @endif
+                                </td>
+                                <td class="px-2 py-2">
+                                    @if($detail->status == 'Approved')
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Approved</span>
+                                    @elseif($detail->status == 'Rejected')
+                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Rejected</span>
+                                    @else
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Pending</span>
                                     @endif
                                 </td>
                                 <td class="px-2 py-2">
@@ -69,7 +101,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="px-2 py-4 text-center text-gray-500">No details found.</td>
+                                <td colspan="16" class="px-2 py-4 text-center text-gray-500">No details found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -85,7 +117,7 @@
     @if ($isOpen)
         <div class="fixed inset-0 z-50 flex items-center justify-center">
             <div class="fixed inset-0 bg-black bg-opacity-50" wire:click="closeModal()"></div>
-            <div class="relative bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="relative bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="px-4 py-3 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
                     <h5 class="font-semibold text-gray-700">{{ $detail_id ? 'Edit Detail' : 'Create Detail' }}</h5>
                     <button class="text-gray-500 hover:text-gray-700" wire:click="closeModal()">
@@ -94,7 +126,7 @@
                 </div>
                 <div class="p-4">
                     <form>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Loan Scheme</label>
                                 <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_id">
@@ -113,24 +145,52 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Feature Name</label>
+                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_name" placeholder="Feature Name">
+                            </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 mt-3">
+                        <div class="grid grid-cols-3 gap-3 mt-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Feature Type</label>
-                                <input type="text" class="w-full px-2 py-1.5 border border-gray-200 bg-gray-100 rounded text-sm" wire:model="loan_scheme_feature_type" readonly>
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_type">
+                                    <option value="">Select Type</option>
+                                    <option value="fixed">Fixed</option>
+                                    <option value="percent">Percent</option>
+                                    <option value="other">Other</option>
+                                </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Feature Value Type</label>
-                                <input type="text" class="w-full px-2 py-1.5 border border-gray-200 bg-gray-100 rounded text-sm" wire:model="loan_scheme_feature_value_type" readonly>
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_value_type">
+                                    <option value="">Select Type</option>
+                                    <option value="number">Number</option>
+                                    <option value="text">Text</option>
+                                    <option value="boolean">Boolean</option>
+                                    <option value="decimal">Decimal</option>
+                                    <option value="percentage">Percentage</option>
+                                    <option value="date">Date</option>
+                                    <option value="other">Other</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 mt-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Feature Value</label>
                                 <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_value" placeholder="Value">
                             </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 mt-3">
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Condition</label>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Feature Mandate</label>
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_mandate">
+                                    <option value="">Select Mandate</option>
+                                    <option value="mandatory">Mandatory</option>
+                                    <option value="optional">Optional</option>
+                                    <option value="conditional">Conditional</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Feature Condition</label>
                                 <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="loan_scheme_feature_condition">
                                     <option value="">Select Condition</option>
                                     <option value="min">Minimum</option>
@@ -139,34 +199,67 @@
                                     <option value="percentage">Percentage</option>
                                 </select>
                             </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Name</label>
+                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="name" placeholder="Name">
+                            </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 mt-3">
+                        <div class="grid grid-cols-3 gap-3 mt-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Index</label>
                                 <input type="number" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="order_index" placeholder="0">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="status" placeholder="Status">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Created By</label>
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="created_by">
+                                    <option value="">Select User</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Approved By</label>
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="approved_by">
+                                    <option value="">Select User</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 mt-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                                <select class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="status">
+                                    <option value="">Select Status</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Remarks</label>
+                                <input type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="remarks" placeholder="Remarks">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-3 mt-3">
                             <div class="flex items-center gap-2">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" wire:model="is_active" id="is_active">
-                                <label class="text-sm text-gray-700" for="is_active">Is Active</label>
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" wire:model="is_optional" id="is_optional">
+                                <label class="text-sm text-gray-700" for="is_optional">Optional</label>
                             </div>
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" wire:model="is_default" id="is_default">
-                                <label class="text-sm text-gray-700" for="is_default">Is Default</label>
+                                <label class="text-sm text-gray-700" for="is_default">Default</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" wire:model="is_active" id="is_active">
+                                <label class="text-sm text-gray-700" for="is_active">Active</label>
                             </div>
                         </div>
                         <div class="mt-3">
                             <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
                             <textarea class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="description" placeholder="Description" rows="2"></textarea>
-                        </div>
-                        <div class="mt-3">
-                            <label class="block text-xs font-medium text-gray-600 mb-1">Remarks</label>
-                            <textarea class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500" wire:model="remarks" placeholder="Remarks" rows="2"></textarea>
                         </div>
                     </form>
                 </div>

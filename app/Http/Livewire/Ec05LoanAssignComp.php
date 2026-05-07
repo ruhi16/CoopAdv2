@@ -20,7 +20,7 @@ class Ec05LoanAssignComp extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $search = '';
-    public $status = '';
+    public $filter_status = '';
     public $isOpen = 0;
     public $isDetailOpen = 0;
     public $selectedLoanRequestId = null;
@@ -47,8 +47,14 @@ class Ec05LoanAssignComp extends Component
     public $emi_amount = '';
     public $first_emi_due_date = '';
     public $next_emi_due_date = '';
-    public $remarks = '';
+    public $order_index = 0;
+    public $is_default = false;
     public $is_active = true;
+    public $created_by = 0;
+    public $approved_by = 0;
+    public $school_id = 0;
+    public $remarks = '';
+    public $status = '';
     public $selected_scheme_details = [];
 
     protected function rules()
@@ -64,47 +70,43 @@ class Ec05LoanAssignComp extends Component
             'emi_amount' => 'nullable|numeric|min:0',
             'first_emi_due_date' => 'nullable|date',
             'next_emi_due_date' => 'nullable|date',
+            'order_index' => 'nullable|integer',
+            'status' => 'nullable|string|max:50',
+            'remarks' => 'nullable|string|max:1000',
         ];
     }
 
     public function render()
     {
+        $users = \App\Models\User::orderBy('name')->get();
         $unassignedLoans = Ec03LoanRequest::with(['member', 'loanScheme', 'loanRequestDetails'])
             ->whereDoesntHave('loanAssigns')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('loan_amount', 'like', '%' . $this->search . '%');
             })
-            ->when($this->status, function ($query) {
-                $query->where('status', $this->status);
+            ->when($this->filter_status, function ($query) {
+                $query->where('status', $this->filter_status);
             })
             ->orderBy('id', 'asc')
             ->get()
             ->map(function ($loan) {
                 $loan->roi = (float) $loan->loanRequestDetails
-                    ->where('loan_scheme_feature_id', 1) // 1 for roi
+                    ->where('loan_scheme_feature_id', 1)
                     ->first()
                     ->loan_scheme_feature_value ?? 0;
-                // $loan->loanRequestDetails = $loan->loanRequestDetails->toArray();
                 return $loan;
             })
             ->toArray();
-        // ->paginate(10);
-        // dd($unassignedLoans);
         $this->assignedLoans = Ec05LoanAssign::with(['member', 'loanScheme', 'loanAssignDetails', 'emiSchedules'])
             ->orderBy('id', 'asc')
             ->get()
             ->map(function ($loan) {
-                // dd($loan);
-                // $loan is an object of Ec05LoanAssign, it has a relationship with loanAssignDetails, emiSchedules
-                // that exists as $loan->loanAssignDetails, $loan->emiSchedules
                 $loan->loan_id = $loan->id;
                 $loan->loan_amount = (float) $loan->loan_amount;
                 $loan->loan_current_balance = (float) $loan->loan_current_balance;
-                // $loan->roi = (float) $loan['member']['id'] ?? 0;
-                // $loan->roi = (float) $loan['loanAssignDetails']['loan_scheme_detail_feature_value'] ?? 0;
                 $loan->roi = (float) $loan->loanAssignDetails
-                    ->where('loan_scheme_detail_feature_id', 1) // 1 for roi
+                    ->where('loan_scheme_detail_feature_id', 1)
                     ->first()
                     ->loan_scheme_detail_feature_value ?? 0;
 
@@ -114,9 +116,7 @@ class Ec05LoanAssignComp extends Component
             })
             ->toArray();
 
-        // dd(json_encode($this->assignedLoans));
-
-        return view('livewire.ec05-loan-assign-comp', compact('unassignedLoans'));
+        return view('livewire.ec05-loan-assign-comp', compact('unassignedLoans', 'users'));
     }
 
     public function openAssignModal($loanRequestId)
@@ -311,8 +311,14 @@ class Ec05LoanAssignComp extends Component
         $this->emi_amount = '';
         $this->first_emi_due_date = '';
         $this->next_emi_due_date = '';
-        $this->remarks = '';
+        $this->order_index = 0;
+        $this->is_default = false;
         $this->is_active = true;
+        $this->created_by = auth()->id() ?? 0;
+        $this->approved_by = 0;
+        $this->school_id = 0;
+        $this->remarks = '';
+        $this->status = '';
         $this->selected_scheme_details = [];
     }
 
@@ -326,21 +332,27 @@ class Ec05LoanAssignComp extends Component
             'loan_scheme_id' => $this->selectedLoanRequest->loan_scheme_id,
             'name' => $this->selectedLoanRequest->name,
             'description' => $this->selectedLoanRequest->description,
+            'order_index' => $this->order_index,
             'loan_assigned_date' => $this->loan_assigned_date,
             'loan_released_date' => $this->loan_released_date,
             'loan_closed_date' => $this->loan_closed_date,
             'loan_amount' => $this->loan_amount,
             'loan_current_balance' => $this->loan_current_balance,
             'roi' => $this->roi,
-            'loan_duration_in_years' => $this->no_of_years,
-            'loan_duration_in_months' => $this->no_of_years * 12,
+            'loan_duration_in_years' => intval($this->no_of_years),
+            'loan_duration_in_months' => intval($this->no_of_emi),
             'is_emi_enabled' => $this->is_emi_enabled,
             'no_of_emi' => $this->no_of_emi,
             'emi_amount' => $this->emi_amount,
             'first_emi_due_date' => $this->first_emi_due_date,
             'next_emi_due_date' => $this->next_emi_due_date,
+            'is_default' => $this->is_default,
             'is_active' => $this->is_active,
-            'status' => 'Assigned',
+            'created_by' => $this->created_by ?: (auth()->id() ?? 0),
+            'approved_by' => $this->approved_by ?? 0,
+            'school_id' => 0,
+            'remarks' => $this->remarks,
+            'status' => $this->status ?: 'Assigned',
         ]);
 
         Ec03LoanRequest::where('id', $this->selectedLoanRequest->id)->update([
@@ -360,6 +372,8 @@ class Ec05LoanAssignComp extends Component
                 'loan_scheme_detail_id' => $detail->loan_scheme_detail_id,
                 'loan_scheme_detail_feature_id' => $detail->loan_scheme_feature_id,
                 'loan_scheme_detail_feature_name' => $detail->loan_scheme_feature_name,
+                'loan_scheme_detail_feature_type' => $detail->loan_scheme_feature_type ?? '',
+                'loan_scheme_detail_feature_mandate' => $detail->loan_scheme_feature_mandate ?? '',
                 'loan_scheme_detail_feature_value' => $detail->loan_scheme_feature_value,
                 'loan_scheme_detail_feature_condition' => $detail->loan_scheme_feature_condition,
                 'name' => $detail->name,
@@ -367,9 +381,9 @@ class Ec05LoanAssignComp extends Component
                 'order_index' => $detail->order_index,
                 'is_default' => $detail->is_default,
                 'is_active' => $detail->is_active,
-                'created_by' => $detail->created_by,
-                'approved_by' => $detail->approved_by,
-                'school_id' => $detail->school_id,
+                'created_by' => auth()->id() ?? 0,
+                'approved_by' => 0,
+                'school_id' => 0,
                 'remarks' => $detail->remarks,
                 'status' => $detail->status,
             ]);

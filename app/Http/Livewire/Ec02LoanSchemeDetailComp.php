@@ -21,12 +21,17 @@ class Ec02LoanSchemeDetailComp extends Component
     public $loan_scheme_feature_type = '';
     public $loan_scheme_feature_value_type = '';
     public $loan_scheme_feature_value = '';
+    public $loan_scheme_feature_mandate = '';
     public $loan_scheme_feature_condition = '';
     public $name = '';
     public $description = '';
     public $order_index = '';
+    public $is_optional = false;
     public $is_default = false;
     public $is_active = true;
+    public $created_by = 0;
+    public $approved_by = 0;
+    public $school_id = 0;
     public $remarks = '';
     public $status = '';
 
@@ -43,12 +48,17 @@ class Ec02LoanSchemeDetailComp extends Component
             'loan_scheme_feature_type' => 'nullable|string|max:100',
             'loan_scheme_feature_value_type' => 'nullable|string|max:50',
             'loan_scheme_feature_value' => 'nullable|string|max:255',
+            'loan_scheme_feature_mandate' => 'nullable|string|max:255',
             'loan_scheme_feature_condition' => 'nullable|string|max:100',
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:500',
             'order_index' => 'nullable|integer|min:0',
+            'is_optional' => 'nullable|boolean',
             'status' => 'nullable|string|max:50',
             'remarks' => 'nullable|string|max:1000',
+            'created_by' => 'nullable|integer',
+            'approved_by' => 'nullable|integer',
+            'school_id' => 'nullable|integer',
         ];
     }
 
@@ -56,8 +66,9 @@ class Ec02LoanSchemeDetailComp extends Component
     {
         $loanSchemes = Ec01LoanScheme::orderBy('name')->get();
         $loanSchemeFeatures = Ec02LoanSchemeFeature::orderBy('name')->get();
+        $users = \App\Models\User::orderBy('name')->get();
 
-        $details = Ec02LoanSchemeDetail::with(['loanScheme', 'loanSchemeFeature'])
+        $details = Ec02LoanSchemeDetail::with(['loanScheme', 'loanSchemeFeature', 'createdBy', 'approvedBy'])
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('description', 'like', '%' . $this->search . '%')
@@ -70,7 +81,7 @@ class Ec02LoanSchemeDetailComp extends Component
             ->orderBy('id', 'desc')
             ->paginate(10);
 
-        return view('livewire.ec02-loan-scheme-detail-comp', compact('details', 'loanSchemes', 'loanSchemeFeatures'));
+        return view('livewire.ec02-loan-scheme-detail-comp', compact('details', 'loanSchemes', 'loanSchemeFeatures', 'users'));
     }
 
     public function create()
@@ -101,12 +112,17 @@ class Ec02LoanSchemeDetailComp extends Component
         $this->loan_scheme_feature_type = '';
         $this->loan_scheme_feature_value_type = '';
         $this->loan_scheme_feature_value = '';
+        $this->loan_scheme_feature_mandate = '';
         $this->loan_scheme_feature_condition = '';
         $this->name = '';
         $this->description = '';
         $this->order_index = '';
+        $this->is_optional = false;
         $this->is_default = false;
         $this->is_active = true;
+        $this->created_by = auth()->id() ?? 0;
+        $this->approved_by = 0;
+        $this->school_id = 0;
         $this->remarks = '';
         $this->status = '';
         $this->confirmingDelete = null;
@@ -129,8 +145,12 @@ class Ec02LoanSchemeDetailComp extends Component
         }
 
         Ec02LoanSchemeDetail::updateOrCreate(['id' => $this->detail_id], array_merge($validated, [
+            'is_optional' => $this->is_optional,
             'is_default' => $this->is_default,
-            'is_active' => true,
+            'is_active' => $this->is_active,
+            'created_by' => $this->created_by ?: (auth()->id() ?? 0),
+            'approved_by' => $this->approved_by ?? 0,
+            'school_id' => 0,
         ]));
 
         session()->flash('message', $this->detail_id ? 'Detail Updated Successfully.' : 'Detail Created Successfully.');
@@ -148,12 +168,17 @@ class Ec02LoanSchemeDetailComp extends Component
         $this->loan_scheme_feature_type = $detail->loan_scheme_feature_type;
         $this->loan_scheme_feature_value_type = $detail->loan_scheme_feature_value_type;
         $this->loan_scheme_feature_value = $detail->loan_scheme_feature_value;
+        $this->loan_scheme_feature_mandate = $detail->loan_scheme_feature_mandate;
         $this->loan_scheme_feature_condition = $detail->loan_scheme_feature_condition;
         $this->name = $detail->name;
         $this->description = $detail->description;
         $this->order_index = $detail->order_index;
+        $this->is_optional = $detail->is_optional;
         $this->is_default = $detail->is_default;
         $this->is_active = $detail->is_active;
+        $this->created_by = $detail->created_by;
+        $this->approved_by = $detail->approved_by;
+        $this->school_id = $detail->school_id;
         $this->remarks = $detail->remarks;
         $this->status = $detail->status;
 

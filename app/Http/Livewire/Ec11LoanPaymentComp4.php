@@ -20,7 +20,7 @@ class Ec11LoanPaymentComp4 extends Component
     public $payment_method = 'cash';
     public $remarks = '';
     public $calculatedPayments = [];
-    public $principal_amounts = [];
+    public $payment_details = []; // [loanId => ['principal' => 0, 'interest' => 0, 'others' => 0]]
     public $confirmingPayment = false;
 
     protected function rules()
@@ -83,11 +83,18 @@ class Ec11LoanPaymentComp4 extends Component
                 } elseif (strpos($name, 'principal') !== false) {
                     $principal = floatval($detail->loan_scheme_detail_feature_value ?? 0);
                 } else {
-                    $other_dues += floatval($detail->loan_scheme_detail_feature_value ?? 0);
+                    $type = strtolower($detail->loan_scheme_detail_feature_type ?? 'fixed');
+                    $val = floatval($detail->loan_scheme_detail_feature_value ?? 0);
+                    if ($type === 'percent') {
+                        $other_dues += ($loan->loan_current_balance * $val) / 100;
+                    } else {
+                        $other_dues += $val;
+                    }
                 }
 
                 $schemeDetails[] = [
                     'name' => $detail->loan_scheme_detail_feature_name,
+                    'type' => $detail->loan_scheme_detail_feature_type,
                     'value' => $detail->loan_scheme_detail_feature_value,
                 ];
             }
@@ -207,12 +214,16 @@ class Ec11LoanPaymentComp4 extends Component
         }
 
         $this->payment_date = date('Y-m-d');
-        $this->principal_amounts = [];
+        $this->payment_details = [];
 
         foreach ($this->selectedLoans as $loanId) {
             $loanItem = collect($this->loanData)->firstWhere('id', $loanId);
             if ($loanItem) {
-                $this->principal_amounts[$loanId] = $loanItem['monthly_emi'];
+                $this->payment_details[$loanId] = [
+                    'principal' => $loanItem['monthly_emi'] > 0 ? $loanItem['monthly_emi'] : 0,
+                    'interest' => 0,
+                    'others' => 0,
+                ];
             }
         }
 
@@ -223,10 +234,7 @@ class Ec11LoanPaymentComp4 extends Component
     public function calculatePayment()
     {
         $this->calculatedPayments = [];
-
-        if (empty($this->selectedLoans)) {
-            return;
-        }
+        if (empty($this->selectedLoans)) return;
 
         $totalPaymentAmount = 0;
 
@@ -234,7 +242,6 @@ class Ec11LoanPaymentComp4 extends Component
             $loanItem = collect($this->loanData)->firstWhere('id', $loanId);
             if (!$loanItem) continue;
 
-            // Calculate days from last payment
             $lastDate = $loanItem['last_payment_date'] ? new \DateTime($loanItem['last_payment_date']) : null;
             $currentDate = new \DateTime($this->payment_date ?: date('Y-m-d'));
 
@@ -242,27 +249,42 @@ class Ec11LoanPaymentComp4 extends Component
             if ($lastDate) {
                 $interval = $lastDate->diff($currentDate);
                 $days = $interval->days;
-                if ($interval->invert) $days = 0; // If payment date is before last date
+                if ($interval->invert) $days = 0;
             }
 
-            // Calculate Interest based on days
-            // Formula: Balance * (ROI / 100) * (Days / 365)
             $dailyRate = ($loanItem['roi'] / 100) / 365;
             $calculatedInterest = $loanItem['balance'] * $dailyRate * $days;
 
-            // Get other dues from scheme details
             $otherDues = 0;
             if (!empty($loanItem['scheme_details'])) {
                 foreach ($loanItem['scheme_details'] as $detail) {
                     $name = strtolower($detail['name'] ?? '');
                     if (strpos($name, 'interest') === false && strpos($name, 'roi') === false && strpos($name, 'principal') === false) {
-                        $otherDues += floatval($detail['value'] ?? 0);
+                        $val = floatval($detail['value'] ?? 0);
+                        $type = strtolower($detail['type'] ?? 'fixed');
+                        
+                        if ($type === 'percent') {
+                            $otherDues += ($loanItem['balance'] * $val) / 100;
+                        } else {
+                            $otherDues += $val;
+                        }
                     }
                 }
             }
 
-            $principalInput = floatval($this->principal_amounts[$loanId] ?? 0);
-            $totalForThisLoan = $calculatedInterest + $otherDues + $principalInput;
+            // Update details array with calculated values if not manually overridden
+            if (!isset($this->payment_details[$loanId]['interest'])) {
+                $this->payment_details[$loanId]['interest'] = 0;
+            }
+            if (!isset($this->payment_details[$loanId]['others'])) {
+                $this->payment_details[$loanId]['others'] = 0;
+            }
+
+            $principalInput = floatval($this->payment_details[$loanId]['principal'] ?? 0);
+            $interestInput = floatval($this->payment_details[$loanId]['interest'] ?? $calculatedInterest);
+            $othersInput = floatval($this->payment_details[$loanId]['others'] ?? $otherDues);
+
+            $totalForThisLoan = $principalInput + $interestInput + $othersInput;
 
             $this->calculatedPayments[$loanId] = [
                 'loan_id' => $loanId,
@@ -272,9 +294,9 @@ class Ec11LoanPaymentComp4 extends Component
                 'roi' => $loanItem['roi'],
                 'balance' => $loanItem['balance'],
                 'days' => $days,
-                'interest' => round($calculatedInterest, 2),
-                'others' => round($otherDues, 2),
-                'principal' => $principalInput,
+                'interest' => round($interestInput, 2),
+                'others' => round($othersInput, 2),
+                'principal' => round($principalInput, 2),
                 'total' => round($totalForThisLoan, 2),
             ];
 
@@ -289,16 +311,8 @@ class Ec11LoanPaymentComp4 extends Component
         $this->calculatePayment();
     }
 
-    public function updatedPrincipalAmounts()
+    public function updatedPaymentDetails()
     {
-        $this->calculatePayment();
-    }
-
-    public function updatedPaymentAmount()
-    {
-        // If the user manually changes the total payment amount, we don't have a clear way to redistribute it 
-        // across principal inputs easily without more complex logic. 
-        // For now, let's just recalculate the total based on principal inputs.
         $this->calculatePayment();
     }
 
@@ -307,7 +321,7 @@ class Ec11LoanPaymentComp4 extends Component
         $this->isOpen = 0;
         $this->selectedLoans = [];
         $this->calculatedPayments = [];
-        $this->principal_amounts = [];
+        $this->payment_details = [];
         $this->confirmingPayment = false;
         $this->payment_amount = '';
         $this->payment_date = '';
@@ -336,15 +350,14 @@ public function store()
             }
 
             $currentBalance = $paymentData['balance'];
-            $payAmount = $paymentData['total'];
-            $principalAmount = $paymentData['principal'];
-            $interestAmount = $paymentData['interest'];
-            $otherAmount = $paymentData['others'];
+            $principalAmount = floatval($this->payment_details[$loanId]['principal'] ?? 0);
+            $interestAmount = floatval($this->payment_details[$loanId]['interest'] ?? 0);
+            $otherAmount = floatval($this->payment_details[$loanId]['others'] ?? 0);
+            $payAmount = $principalAmount + $interestAmount + $otherAmount;
 
-            // Update balance after principal payment
             $balanceAfterPayment = $currentBalance - $principalAmount;
 
-$payment = Ec11LoanPayment::create([
+            $payment = Ec11LoanPayment::create([
                 'loan_assign_id' => $loanId,
                 'member_id' => $loan->member_id,
                 'payment_total_amount' => $payAmount,
@@ -357,17 +370,15 @@ $payment = Ec11LoanPayment::create([
                 'remarks' => $this->remarks,
             ]);
 
-            // Save detail for principal amount
-            if ($principalAmount > 0) {
-                Ec12LoanPaymentDetail::create([
-                    'loan_payment_id' => $payment->id,
-                    'loan_assign_detail_amount' => $principalAmount,
-                    'is_active' => true,
-                    'remarks' => 'Principal Payment',
-                ]);
-            }
+            // Always create a detail entry for Principal
+            Ec12LoanPaymentDetail::create([
+                'loan_payment_id' => $payment->id,
+                'loan_assign_detail_amount' => $principalAmount,
+                'is_active' => true,
+                'remarks' => 'Principal Payment',
+            ]);
 
-            // Save detail for interest amount
+            // Create detail entry for Interest if applicable
             if ($interestAmount > 0) {
                 Ec12LoanPaymentDetail::create([
                     'loan_payment_id' => $payment->id,
@@ -377,7 +388,7 @@ $payment = Ec11LoanPayment::create([
                 ]);
             }
 
-            // Save detail for other amounts
+            // Create detail entry for Other charges if applicable
             if ($otherAmount > 0) {
                 Ec12LoanPaymentDetail::create([
                     'loan_payment_id' => $payment->id,
@@ -387,7 +398,6 @@ $payment = Ec11LoanPayment::create([
                 ]);
             }
 
-            // Update loan balance in Ec05LoanAssign if it exists
             if (isset($loan->loan_current_balance)) {
                 $loan->update(['loan_current_balance' => $balanceAfterPayment]);
             }

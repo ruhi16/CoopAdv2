@@ -136,14 +136,13 @@
                                                     <td class="px-2 py-2 border border-gray-300">{{ date('d-m-Y', strtotime($payment['payment_date'])) }}</td>
                                                     <td class="px-2 py-2 border border-gray-300">{{ number_format($payment['payment_total_amount'], 2) }}</td>
                                                     <td class="px-2 py-2 border border-gray-300">
-                                                        {{-- {{ json_encode($payment['payment_details']) }} --}}
                                                         @foreach($payment['payment_details'] as $detail)
-                                                            {{-- <span class="mr-3">{{ $detail['id'] ?? '-' }}: {{ number_format($detail['value'] ?? 0, 2) }}</span> --}}
-                                                            {{-- <span class="mr-3">{{ json_encode($detail) }}</span> --}}
-                                                            <span class="mr-3">{{ $detail['id'] ?? '-' }}</span>
+                                                            <span class="inline-block px-2 py-0.5 mr-1 mb-1 text-xs rounded 
+                                                                {{ $detail['remarks'] == 'Principal Payment' ? 'bg-blue-100 text-blue-800' : 
+                                                                   ($detail['remarks'] == 'Interest Payment' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800') }}">
+                                                                {{ $detail['remarks'] ?? 'Detail' }}: {{ number_format($detail['loan_assign_detail_amount'] ?? 0, 2) }}
+                                                            </span>
                                                         @endforeach
-                                                        {{-- {{ $payment['remarks'] ?? '-' }} --}}
-                                                        {{-- {{ $payment['loan_payment_details'] ?? '-' }} --}}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -222,7 +221,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-xs font-semibold text-gray-700 mb-2">Selected Loans Details</label>
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Payment Breakdown Details</label>
                             <div class="overflow-x-auto border border-gray-200 rounded">
                                 <table class="min-w-full text-xs">
                                     <thead class="bg-gray-50">
@@ -232,8 +231,8 @@
                                             <th class="px-2 py-2 text-right font-medium text-gray-600">ROI %</th>
                                             <th class="px-2 py-2 text-right font-medium text-gray-600">Balance</th>
                                             <th class="px-2 py-2 text-center font-medium text-gray-600">Days</th>
-                                            <th class="px-2 py-2 text-right font-medium text-gray-600">Interest</th>
-                                            <th class="px-2 py-2 text-right font-medium text-gray-600">Others</th>
+                                            <th class="px-2 py-2 text-right font-medium text-gray-600 w-32">Interest</th>
+                                            <th class="px-2 py-2 text-right font-medium text-gray-600 w-32">Others</th>
                                             <th class="px-2 py-2 text-right font-medium text-gray-600 w-32">Principal</th>
                                             <th class="px-2 py-2 text-right font-medium text-gray-600">Total</th>
                                         </tr>
@@ -246,12 +245,22 @@
                                                 <td class="px-2 py-2 text-right">{{ number_format($calc['roi'], 2) }}%</td>
                                                 <td class="px-2 py-2 text-right font-medium">{{ number_format($calc['balance'], 2) }}</td>
                                                 <td class="px-2 py-2 text-center">{{ $calc['days'] }}</td>
-                                                <td class="px-2 py-2 text-right text-blue-600">{{ number_format($calc['interest'], 2) }}</td>
-                                                <td class="px-2 py-2 text-right text-gray-600">{{ number_format($calc['others'], 2) }}</td>
                                                 <td class="px-2 py-2 text-right">
                                                     <input type="number" step="0.01" 
-                                                        class="w-full px-2 py-1 border border-blue-300 rounded text-right text-xs focus:outline-none focus:border-blue-500 bg-blue-50" 
-                                                        wire:model.lazy="principal_amounts.{{ $loanId }}"
+                                                        class="w-full px-2 py-1 border border-orange-300 rounded text-right text-xs focus:outline-none focus:border-orange-500 bg-orange-50" 
+                                                        wire:model.lazy="payment_details.{{ $loanId }}.interest"
+                                                        placeholder="0.00">
+                                                </td>
+                                                <td class="px-2 py-2 text-right">
+                                                    <input type="number" step="0.01" 
+                                                        class="w-full px-2 py-1 border border-gray-300 rounded text-right text-xs focus:outline-none focus:border-gray-500" 
+                                                        wire:model.lazy="payment_details.{{ $loanId }}.others"
+                                                        placeholder="0.00">
+                                                </td>
+                                                <td class="px-2 py-2 text-right">
+                                                    <input type="number" step="0.01" 
+                                                        class="w-full px-2 py-1 border border-blue-300 rounded text-right text-xs focus:outline-none focus:border-blue-500 bg-blue-50 font-bold" 
+                                                        wire:model.lazy="payment_details.{{ $loanId }}.principal"
                                                         placeholder="0.00">
                                                 </td>
                                                 <td class="px-2 py-2 text-right font-bold text-green-700">{{ number_format($calc['total'], 2) }}</td>
