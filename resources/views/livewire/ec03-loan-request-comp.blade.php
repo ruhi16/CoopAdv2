@@ -59,14 +59,14 @@
                                 <td class="px-3 py-2">{{ $request->loanScheme->name ?? '-' }}</td>
                                 <td class="px-3 py-2">{{ number_format($request->loan_amount, 2) }}</td>
                                 <td class="px-3 py-2">
-                                    @if($request->is_loan_assigned)
+                                    {{-- @if($request->is_loan_assigned) --}}
                                         @forelse ($request->loanRequestDetails as $detail)
                                             {{ $detail->loan_scheme_feature_name }}: {{ $detail->loan_scheme_feature_value }} %<br/>
                                         
                                         @empty
                                             {{ '-' }}
                                         @endforelse
-                                    @endif
+                                    {{-- @endif --}}
                                 </td>
                                 {{-- <td class="px-3 py-2">
                                     @if($request->status == 'Approved')

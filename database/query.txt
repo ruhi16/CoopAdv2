@@ -8,6 +8,12 @@ FROM mtloanassign st, members m, mtloanpayment stp
 WHERE st.mId = m.id AND st.Id = stp.LId AND stp.colDate = '2026-04-01 00:00:00'
 ORDER BY m.id, stp.colDate;
 
+in @app\Http\Livewire\Ec11LoanPaymentComp5.php and its view arrange all active loan assignment that is not cleared or due till now, with detail of its last 3 payment details, categorize the loan assignment according to loan scheme and then if  emi enabled or not with different color and  different tables,
+there should be option for single payment and multiple payment at a time,
+when payment is initialized a record should entered in table using model @app\Models\Ec11LoanPayment.php that hold total amount date of payment mode of payment any remarks either payment is done or not, then its details should be placed in table using @app\Models\Ec12LoanPaymentDetail.php model from the corresponding loan assign and loan assign detail tables using model @app\Models\Ec05LoanAssign.php and @app\Models\Ec06LoanAssignDetail.php 
+for non-emi entry there must be a entry for principal amount to be entered other required field should be auto calculated , for emi entry also principal and interest amount differently entered
+also make provision for lumpsum entry in case of emi enabled loan, and adjustment of emi, either by reducing no of emis or making overall amount fixed but
+
 -- Narayan Barman
 INSERT INTO "ec05_loan_assigns" ("member_id", "loan_request_id", "loan_scheme_id", "loan_amount", "loan_current_balance", "loan_assigned_date") 
 VALUES (1, 1, 1, 75000, 50000, '2026-04-01 00:00:00');

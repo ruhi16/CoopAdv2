@@ -18,4 +18,14 @@ class School extends Model
         'phone',
         'email',
     ];
+
+    public function users(){
+        return $this->hasMany(User::class, 'school_id', 'id');
+    }
+
+    public function members(){
+        return $this->hasMany(Member::class, 'school_id', 'id');
+    }
+
+    
 }

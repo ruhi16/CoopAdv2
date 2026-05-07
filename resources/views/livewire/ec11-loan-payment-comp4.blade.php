@@ -124,7 +124,7 @@
                                                 <tr class="text-left ">
                                                     <th class="px-2 py-2 border border-gray-300">Sl</th>
                                                     <th class="px-2 py-2 border border-gray-300">Pay Dt</th>
-                                                    <th class="px-2 py-2 border border-gray-300">Payment Amount</th>
+                                                    <th class="px-2 py-2 border border-gray-300">Total Amount</th>
                                                     <th class="px-2 py-2 border border-gray-300">Payment Details</th>
                                                     {{-- <th class="px-2 py-2 border border-gray-300">Remarks</th> --}}
                                                 </tr>
@@ -137,6 +137,7 @@
                                                     <td class="px-2 py-2 border border-gray-300">{{ number_format($payment['payment_total_amount'], 2) }}</td>
                                                     <td class="px-2 py-2 border border-gray-300">
                                                         @foreach($payment['payment_details'] as $detail)
+                                                            {{ $loop->index + 1 }}: {{ $detail['id']}}
                                                             <span class="inline-block px-2 py-0.5 mr-1 mb-1 text-xs rounded 
                                                                 {{ $detail['remarks'] == 'Principal Payment' ? 'bg-blue-100 text-blue-800' : 
                                                                    ($detail['remarks'] == 'Interest Payment' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800') }}">
