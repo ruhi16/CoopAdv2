@@ -157,7 +157,8 @@
                     {{-- @livewire('ec11-loan-payment-comp') --}}
                     {{-- @livewire('ec11-loan-payment-comp2') --}}
                     {{-- @livewire('ec11-loan-payment-comp3') --}}
-                    @livewire('ec11-loan-payment-comp4')
+                    <!-- @livewire('ec11-loan-payment-comp4') -->
+                    @livewire('ec11-loan-payment-comp5')
 
 
                 @elseif($activeMenu === 'bank_borrowed_loan_payments')
