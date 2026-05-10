@@ -163,6 +163,13 @@
                                     <option value="3">3 Years</option>
                                     <option value="4">4 Years</option>
                                     <option value="5">5 Years</option>
+                                    <option value="6">6 Years</option>
+                                    <option value="7">7 Years</option>
+                                    <option value="8">8 Years</option>
+                                    <option value="9">9 Years</option>
+                                    <option value="10">10 Years</option>
+                                    <option value="11">11 Years</option>
+                                    <option value="12">12 Years</option>
                                 </select>
                             </div>
                             <div class="flex items-center mt-5">
@@ -240,6 +247,7 @@
                                         <tr>
                                             <th class="px-2 py-1 text-left font-medium text-gray-600">EMI No.</th>
                                             <th class="px-2 py-1 text-left font-medium text-gray-600">Principal Amt</th>
+                                            <th class="px-2 py-1 text-left font-medium text-gray-600">Balance Amt</th>
                                             <th class="px-2 py-1 text-left font-medium text-gray-600">Interest Amt</th>
                                             <th class="px-2 py-1 text-left font-medium text-gray-600">Total</th>
                                         </tr>
@@ -249,6 +257,7 @@
                                             <tr>
                                                 <td class="px-2 py-1">{{ $emi['emi_no'] }}</td>
                                                 <td class="px-2 py-1">{{ number_format($emi['principal_amount'], 2) }}</td>
+                                                <td class="px-2 py-1">{{ number_format($emi['balance_amount'], 2) }}</td>
                                                 <td class="px-2 py-1">{{ number_format($emi['interest_amount'], 2) }}</td>
                                                 <td class="px-2 py-1">{{ number_format($emi['total'], 2) }}</td>
                                             </tr>

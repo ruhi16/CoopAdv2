@@ -114,15 +114,36 @@
                                 @endif
                                 <td class="px-2 py-2">
                                     @if(count($loan['last_payments']) > 0)
+                                    <table class="w-full">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-2 py-1 border border-gray-200">Date</th>
+                                                <th class="px-2 py-1 border border-gray-200">Amount</th>
+                                                <th class="px-2 py-1 border border-gray-200 text-left">Remarks</th>
+                                            </tr>
+                                        </thead>
                                         @foreach($loan['last_payments'] as $lp)
-                                            <div class="text-xs leading-tight {{ $loop->index > 0 ? 'mt-0.5' : '' }}">
+                                            <tbody>
+                                            <tr class="text-xs">
+                                                <td class="px-2 py-1 border border-gray-200">{{ \Carbon\Carbon::parse($lp['date'])->format('d/m') }}</td>
+                                                <td class="px-2 py-1 border border-gray-200 text-right">{{ number_format($lp['amount'], 0) }}</td>
+                                                <td class="px-2 py-1 border border-gray-200">
+                                                    @foreach($lp['details'] as $ld)
+                                                        <span class="text-gray-400 ml-1">{{Str::substr($ld['remarks'] ?? 'Detail', 0, 3) }}:</span>                                                    
+                                                        <span class="text-gray-400 ml-1">{{ $ld['amount'] ?? 'X' }}</span>,
+                                                    @endforeach
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                            {{-- <div class="text-xs leading-tight {{ $loop->index > 0 ? 'mt-0.5' : '' }}">
                                                 <span class="text-gray-500">{{ \Carbon\Carbon::parse($lp['date'])->format('d/m') }}:</span>
                                                 <span class="font-medium">{{ number_format($lp['amount'], 0) }}</span>
                                                 @foreach($lp['details'] as $ld)
                                                     <span class="text-gray-400 ml-1">({{ $ld['remarks'] ?? 'Detail' }})</span>
                                                 @endforeach
-                                            </div>
+                                            </div> --}}
                                         @endforeach
+                                    </table>
                                     @else
                                         <span class="text-gray-400">No payments</span>
                                     @endif

@@ -75,7 +75,7 @@
                                     @if($loan['no_of_years'] > 1 && $loan['no_of_years'] <= 5)
                                         <button class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700" wire:click="openAssignModal({{ $loan['id'] }})">Loan Assign</button>
                                     @else
-                                        <button class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700" wire:click="openAssignModal({{ $loan->id }})">Loan Assign</button>
+                                        <button class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700" wire:click="openAssignModal({{ $loan['id'] }})">Loan Assign</button>
                                     @endif
                                 </td>
                             </tr>

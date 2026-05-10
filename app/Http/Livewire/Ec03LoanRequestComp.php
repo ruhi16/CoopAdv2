@@ -146,7 +146,7 @@ class Ec03LoanRequestComp extends Component
                     'is_active' => $detail->is_active,
                     'created_by' => auth()->id() ?? 0,
                     'approved_by' => 0,
-                    'school_id' => 0,
+                    'school_id' => auth()->user()->school_id ?? 0,
                     'remarks' => $detail->remarks,
                     'status' => $detail->status,
                 ]);
@@ -249,6 +249,7 @@ class Ec03LoanRequestComp extends Component
 
             $this->calculatedEmis[] = [
                 'emi_no' => $i,
+                'balance_amount' => $principal,
                 'principal_amount' => round($principalAmount, 2),
                 'interest_amount' => round($interestAmount, 2),
                 'total' => round($monthlyEmi, 2),
